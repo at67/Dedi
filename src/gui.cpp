@@ -453,6 +453,10 @@ namespace Gui
         SetTargetFPS(60);
         SetExitKey(KEY_NULL);
 
+        Image icon = LoadImage("juggler.png");
+        SetWindowIcon(icon);
+        UnloadImage(icon);
+
         if(!loadConfig("config.ini"))   return false;
         if(!loadOptions("options.ini")) return false;
 
