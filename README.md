@@ -12,4 +12,4 @@ Is a Windows 10/11 only tool that allows for the simple installation, monitoring
 - Has a status display that keeps you constantly informed about the server's health.<br/>
 - Is able to restart the server after a server crash or unknown server shutdown.<br/>
 - Automatically creates backups of all important files before attempting anything of a serious nature.<br/>
-- Creates a backup of your server's save file for every player that logs in to the server, (this allows s simple rollback mechanism for miscreant players).<br/>
+- Creates a backup of your server's save file for every player that logs in to the server, (this allows a simple rollback mechanism for miscreant players).<br/>
