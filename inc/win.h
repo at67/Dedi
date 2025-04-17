@@ -16,6 +16,7 @@ namespace Win
     bool moveFile(const std::string& src, const std::string& dst, bool overwrite=false);
     bool copyFile(const std::string& src, const std::string& dst, bool overwrite=false);
     bool createDirectory(const std::string& path);
+    bool copyDirectory(const std::string& src, const std::string& dst);
 
     bool getFilenames(const std::string& path, const std::string& search, std::vector<std::string>& filenames);
 

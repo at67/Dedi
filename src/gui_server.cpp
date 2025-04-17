@@ -174,6 +174,26 @@ namespace Gui
         return (Win::matchConsoleText("A crash has been intercepted by the crash handler.", line, true) != std::string::npos);
     }
 
+    std::string getSaveFile()
+    {
+        char* appdata = getenv("APPDATA");
+        std::string saves = appdata + std::string("/../") + getAskaConfig(AskaSavePath);
+        return saves + "/server/savegame_" + getServerConfig(SaveId);
+    }
+
+    bool backupSave()
+    {
+        std::string saves = getDediConfig(InstallPath) + "/" + getDediConfig(SavesFolder);
+        Win::createDirectory(saves);
+        saves += "/" + getServerConfig(SaveId);
+        Win::createDirectory(saves);
+        std::string save = getSaveFile();
+        bool success = Win::copyDirectory(save, saves);
+        if(success) log(Util::Success, stderr, _f, _F, _L, "Backed up Save from %s to %s", save.c_str(), saves.c_str());
+
+        return true;
+    }
+
     bool checkPlayerConnected()
     {
         std::string player;
@@ -185,6 +205,9 @@ namespace Gui
 
         Util::logStatus("Player : " + player + " : connected");
         _playerList.insert(player);
+
+        backupSave();
+
         return true;
     }
 

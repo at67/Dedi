@@ -107,6 +107,29 @@ namespace Win
         return result;
     }
 
+    // Only copies files in a directory, NOT sub-directories!
+    bool copyDirectory(const std::string& src, const std::string& dst)
+    {
+        DIR* dir;
+        if((dir = opendir(src.c_str())) == nullptr) return false;
+
+        struct dirent* ent;
+        while((ent = readdir(dir)) != nullptr)
+        {
+            if(ent->d_type == DT_DIR) continue;
+
+            if(ent->d_type == DT_REG)
+            {
+                std::string file = std::string(ent->d_name);
+                copyFile(src + "/" + file, dst + "/" + file, true);
+            }
+        }
+
+        closedir(dir);
+
+        return true;
+    }
+
     bool getFilenames(const std::string& path, const std::string& search, std::vector<std::string>& filenames)
     {
         DIR* dir;
