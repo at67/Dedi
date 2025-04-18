@@ -20,16 +20,4 @@ Is a Windows 10/11 only tool that allows for the simple installation, monitoring
 <br/>
 <br/>
 
-![Server Tab](server.png)
-
-<br/>
-
-![Config Tab](config.png)
-
-<br/>
-
-![World Tab](world.png)
-
-<br/>
-
-![Options Tab](options.png)
+![Dedi](dedi.png)

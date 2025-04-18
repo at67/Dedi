@@ -23,7 +23,7 @@ namespace Status
     static int _startIndex = 0;
     static int _endIndex = 0;
     static int _maxIndex = 0;
-    static int _maxLines = 7;
+    static int _maxLines = 6;
 
     static int _charIndex = 0;
     static int _maxPixels = 0;
@@ -111,16 +111,16 @@ namespace Status
     void draw(const std::string& title, const Rectangle& bounds)
     {
         _bounds = bounds;
-        _maxLines = int((_bounds.height - 15) / GuiGetStyle(DEFAULT, TEXT_SIZE));
+        _maxLines = int((_bounds.height - 25) / GuiGetStyle(DEFAULT, TEXT_SIZE));
 
         // Vertical scroll bar
         GuiSetStyle(SCROLLBAR, ARROWS_VISIBLE, 1);
-        Rectangle scrollV = {bounds.x + bounds.width - 13, bounds.y + 1, 12, bounds.height - 14};
+        Rectangle scrollV = {bounds.x + bounds.width - 16, bounds.y + 1, 15, bounds.height - 14};
         if(_maxIndex > _maxLines) _startIndex = GuiScrollBar(scrollV, _startIndex, 0, _scrollIndex);
         else GuiScrollBar(scrollV, _startIndex, 0, _scrollIndex);
 
         // Horizontal scroll bar
-        Rectangle scrollH = {bounds.x + 1, bounds.y + bounds.height - 13, bounds.width - 14, 12};
+        Rectangle scrollH = {bounds.x + 1, bounds.y + bounds.height - 16, bounds.width - 14, 15};
         int endCharIndex = int(_status[_savedIndex]._text.size()) - 80;
         _charIndex = GuiScrollBar(scrollH, _charIndex, 0, endCharIndex);
 
@@ -134,7 +134,7 @@ namespace Status
         for(int i=_startIndex; i<_endIndex; i++)
         {
             int y = (i - _startIndex) * GuiGetStyle(DEFAULT, TEXT_SIZE);
-            drawText(_status[i]._text, i, _charIndex, int(_bounds.x + 10), int(_bounds.y + y + 5), GetColor(GuiGetStyle(LABEL, TEXT_COLOR_DISABLED)));
+            drawText(_status[i]._text, i, _charIndex, int(_bounds.x + 10), int(_bounds.y + y + 10), GetColor(GuiGetStyle(LABEL, TEXT_COLOR_DISABLED)));
         }
     }
 }
