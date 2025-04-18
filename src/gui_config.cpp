@@ -23,8 +23,8 @@ namespace Gui
         {"SavesFolder",     "Saves folder, (you should never need to modify this)",                                 "",      "saves",   "", TextBox, false, 0, false, STATE_NORMAL,   0, ""},
         {"BackupFolder",    "Backup folder, (you should never need to modify this)",                                "",      "backup",  "", TextBox, false, 0, false, STATE_NORMAL,   0, ""},
         {"InitialStyle",    "Startup style, choose one from the Styles button list",                                "",      "Mono",    "", TextBox, false, 0, false, STATE_NORMAL,   0, ""},
-        {"MaxArchiveSaves", "Maximum number of archive saves",                                                      "0;20",  "5",       "", Spinner, false, 0, false, STATE_NORMAL, 300, ""},
-        {"MaxUsersSaves",   "Maximum number of users saves",                                                        "0;50",  "10",      "", Spinner, false, 0, false, STATE_NORMAL, 300, ""}
+        {"MaxArchiveSaves", "Maximum number of archive saves",                                                      "1;20",  "5",       "", Spinner, false, 0, false, STATE_NORMAL, 300, ""},
+        {"MaxUsersSaves",   "Maximum number of users saves",                                                        "1;50",  "10",      "", Spinner, false, 0, false, STATE_NORMAL, 300, ""}
     };
 
     // Steam config
@@ -269,7 +269,7 @@ namespace Gui
                 // TODO: uses option as an integer value, a bit hacky but will do for now
                 case Spinner:
                 {
-                    int min = 0, max = 0, itemCount = 0;
+                    int min = 1, max = 1, itemCount = 0;
                     const char **items = GuiTextSplit(configEntries[i]._options.c_str(), ';', &itemCount, nullptr);
                     if(itemCount == 2)
                     {
