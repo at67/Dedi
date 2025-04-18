@@ -29,6 +29,12 @@ namespace Gui
     std::string getAskaConfig(AskaEntries entry);
     std::string getServerConfig(ServerEntries entry);
 
+    std::string getDediConfigName(DediEntries entry);
+    std::string getSteamConfigName(SteamEntries entry);
+    std::string getSteamCmdConfigName(SteamCmdEntries entry);
+    std::string getAskaConfigName(AskaEntries entry);
+    std::string getServerConfigName(ServerEntries entry);
+
     void setServerConfig(ServerEntries entry, const std::string& value);
 
     bool getMiscOptions(MiscEntries entry);

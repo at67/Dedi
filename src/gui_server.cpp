@@ -331,9 +331,81 @@ namespace Gui
         GuiLabel({450 + float(Status::getTextPixels("Crash Restarts:  ")), 290, 200, 20}, crashes);
     }
 
-    void drawChatHistory()
+    void drawServerInfo()
     {
         GuiGroupBox({20, 365, 830, 230}, "Info");
+
+        GuiLabel({30, 380, 150, 20}, std::string(getServerConfigName(DediName) + ":").c_str());
+        GuiLabel({30, 405, 150, 20}, std::string(getServerConfigName(DisplayName) + ":").c_str());
+        GuiLabel({30, 430, 150, 20}, std::string(getServerConfigName(ServerName) + ":").c_str());
+        GuiLabel({30, 455, 150, 20}, std::string(getServerConfigName(Seed) + ":").c_str());
+        GuiLabel({30, 480, 150, 20}, std::string(getServerConfigName(Password) + ":").c_str());
+        GuiLabel({30, 505, 150, 20}, std::string(getServerConfigName(SaveId) + ":").c_str());
+        GuiLabel({30, 530, 150, 20}, std::string(getServerConfigName(Region) + ":").c_str());
+        GuiLabel({30, 555, 150, 20}, std::string(getServerConfigName(Mode) + ":").c_str());
+
+        GuiSetState(STATE_DISABLED);
+        GuiLabel({145, 380, 150, 20}, getServerConfig(DediName).c_str());
+        GuiLabel({145, 405, 150, 20}, getServerConfig(DisplayName).c_str());
+        GuiLabel({145, 430, 150, 20}, getServerConfig(ServerName).c_str());
+        GuiLabel({145, 455, 150, 20}, getServerConfig(Seed).c_str());
+        GuiLabel({145, 480, 150, 20}, getServerConfig(Password).c_str());
+        GuiLabel({145, 505, 150, 20}, getServerConfig(SaveId).c_str());
+        GuiLabel({145, 530, 150, 20}, getServerConfig(Region).c_str());
+        GuiLabel({145, 555, 150, 20}, getServerConfig(Mode).c_str());
+        GuiSetState(STATE_NORMAL);
+
+        GuiLabel({320, 380, 150, 20}, std::string(getServerConfigName(Region) + ":").c_str());
+        GuiLabel({320, 405, 150, 20}, std::string(getServerConfigName(AutosaveStyle) + ":").c_str());
+        GuiLabel({320, 430, 150, 20}, std::string(getServerConfigName(Mode) + ":").c_str());
+        if(getServerConfig(Mode) == "custom")
+        {
+            GuiLabel({320, 455, 150, 20}, std::string(getServerConfigName(TerrainAspect) + ":").c_str());
+            GuiLabel({320, 480, 150, 20}, std::string(getServerConfigName(TerrainHeight) + ":").c_str());
+            GuiLabel({320, 505, 150, 20}, std::string(getServerConfigName(StartingSeason) + ":").c_str());
+            GuiLabel({320, 530, 150, 20}, std::string(getServerConfigName(YearLength) + ":").c_str());
+            GuiLabel({320, 555, 150, 20}, std::string(getServerConfigName(Precipitation) + ":").c_str());
+        }
+
+        GuiSetState(STATE_DISABLED);
+        GuiLabel({465, 380, 150, 20}, getServerConfig(Region).c_str());
+        GuiLabel({465, 405, 150, 20}, getServerConfig(AutosaveStyle).c_str());
+        GuiLabel({465, 430, 150, 20}, getServerConfig(Mode).c_str());
+        if(getServerConfig(Mode) == "custom")
+        {
+            GuiLabel({465, 455, 150, 20}, getServerConfig(TerrainAspect).c_str());
+            GuiLabel({465, 480, 150, 20}, getServerConfig(TerrainHeight).c_str());
+            GuiLabel({465, 505, 150, 20}, getServerConfig(StartingSeason).c_str());
+            GuiLabel({465, 530, 150, 20}, getServerConfig(YearLength).c_str());
+            GuiLabel({465, 555, 150, 20}, getServerConfig(Precipitation).c_str());
+        }
+        GuiSetState(STATE_NORMAL);
+
+        if(getServerConfig(Mode) == "custom")
+        {
+            GuiLabel({600, 380, 160, 20}, std::string(getServerConfigName(DayLength) + ":").c_str());
+            GuiLabel({600, 405, 160, 20}, std::string(getServerConfigName(StructureDecay) + ":").c_str());
+            GuiLabel({600, 430, 160, 20}, std::string(getServerConfigName(InvasionDificulty) + ":").c_str());
+            GuiLabel({600, 455, 160, 20}, std::string(getServerConfigName(MonsterDensity) + ":").c_str());
+            GuiLabel({600, 480, 160, 20}, std::string(getServerConfigName(MonsterPopulation) + ":").c_str());
+            GuiLabel({600, 505, 160, 20}, std::string(getServerConfigName(InvasionDificulty) + ":").c_str());
+            GuiLabel({600, 530, 160, 20}, std::string(getServerConfigName(MonsterDensity) + ":").c_str());
+            GuiLabel({600, 555, 160, 20}, std::string(getServerConfigName(MonsterPopulation) + ":").c_str());
+        }
+
+        if(getServerConfig(Mode) == "custom")
+        {
+            GuiSetState(STATE_DISABLED);
+            GuiLabel({770, 380, 160, 20}, getServerConfig(DayLength).c_str());
+            GuiLabel({770, 405, 160, 20}, getServerConfig(StructureDecay).c_str());
+            GuiLabel({770, 430, 160, 20}, getServerConfig(InvasionDificulty).c_str());
+            GuiLabel({770, 455, 160, 20}, getServerConfig(MonsterDensity).c_str());
+            GuiLabel({770, 480, 160, 20}, getServerConfig(MonsterPopulation).c_str());
+            GuiLabel({770, 505, 160, 20}, getServerConfig(InvasionDificulty).c_str());
+            GuiLabel({770, 530, 160, 20}, getServerConfig(MonsterDensity).c_str());
+            GuiLabel({770, 555, 160, 20}, getServerConfig(MonsterPopulation).c_str());
+            GuiSetState(STATE_NORMAL);
+        }
     }
 
     void handleServerEntries()
@@ -480,7 +552,7 @@ namespace Gui
         drawUpTime();
         drawActiveTime();
         drawCrashRestarts();
-        drawChatHistory();
+        drawServerInfo();
 
         handleServerButtons();
     }

@@ -134,7 +134,7 @@ namespace Status
         for(int i=_startIndex; i<_endIndex; i++)
         {
             int y = (i - _startIndex) * GuiGetStyle(DEFAULT, TEXT_SIZE);
-            drawText(_status[i]._text, i, _charIndex, int(_bounds.x + 10), int(_bounds.y + y + 5), GetColor(GuiGetStyle(DEFAULT, TEXT_COLOR_DISABLED)));
+            drawText(_status[i]._text, i, _charIndex, int(_bounds.x + 10), int(_bounds.y + y + 5), GetColor(GuiGetStyle(LABEL, TEXT_COLOR_DISABLED)));
         }
     }
 }

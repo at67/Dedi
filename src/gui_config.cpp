@@ -103,6 +103,12 @@ namespace Gui
     std::string getAskaConfig(AskaEntries entry)         {return _askaConfig[entry]._value;    }
     std::string getServerConfig(ServerEntries entry)     {return _serverConfig[entry]._value;  }
 
+    std::string getDediConfigName(DediEntries entry)         {return _dediConfig[entry]._key;    }
+    std::string getSteamConfigName(SteamEntries entry)       {return _steamConfig[entry]._key;   }
+    std::string getSteamCmdConfigName(SteamCmdEntries entry) {return _steamCmdConfig[entry]._key;}
+    std::string getAskaConfigName(AskaEntries entry)         {return _askaConfig[entry]._key;    }
+    std::string getServerConfigName(ServerEntries entry)     {return _serverConfig[entry]._key;  }
+
     void setServerConfig(ServerEntries entry, const std::string& value)
     {
         Util::strcpy(_serverConfig[entry]._value, value, MAX_CONFIG_TEXT, _F, _L);
