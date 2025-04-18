@@ -358,46 +358,44 @@ namespace Gui
         GuiStatusBar({135, 530, 150, 20}, getServerConfig(Region).c_str());
         GuiStatusBar({135, 555, 150, 20}, getServerConfig(Mode).c_str());
 
-        GuiLabel({300, 380, 150, 20}, getServerConfigName(Region).c_str());
+        GuiLabel({300, 380, 110, 20}, "WorldAlive");
         GuiLabel({300, 405, 150, 20}, getServerConfigName(AutosaveStyle).c_str());
-        GuiLabel({300, 430, 150, 20}, getServerConfigName(Mode).c_str());
         if(getServerConfig(Mode) == "custom")
         {
-            GuiLabel({300, 455, 150, 20}, getServerConfigName(TerrainAspect).c_str());
-            GuiLabel({300, 480, 150, 20}, getServerConfigName(TerrainHeight).c_str());
-            GuiLabel({300, 505, 150, 20}, getServerConfigName(StartingSeason).c_str());
-            GuiLabel({300, 530, 150, 20}, getServerConfigName(YearLength).c_str());
-            GuiLabel({300, 555, 150, 20}, getServerConfigName(Precipitation).c_str());
+            GuiLabel({300, 430, 150, 20}, getServerConfigName(TerrainAspect).c_str());
+            GuiLabel({300, 455, 150, 20}, getServerConfigName(TerrainHeight).c_str());
+            GuiLabel({300, 480, 150, 20}, getServerConfigName(StartingSeason).c_str());
+            GuiLabel({300, 505, 150, 20}, getServerConfigName(YearLength).c_str());
+            GuiLabel({300, 530, 150, 20}, getServerConfigName(Precipitation).c_str());
+            GuiLabel({300, 555, 150, 20}, getServerConfigName(DayLength).c_str());
         }
 
-        GuiStatusBar({435, 380, 135, 20}, getServerConfig(Region).c_str());
+        GuiStatusBar({435, 380, 135, 20}, getServerConfig(KeepServerWorldAlive).c_str());
         GuiStatusBar({435, 405, 135, 20}, getServerConfig(AutosaveStyle).c_str());
-        GuiStatusBar({435, 430, 135, 20}, getServerConfig(Mode).c_str());
         if(getServerConfig(Mode) == "custom")
         {
-            GuiStatusBar({435, 455, 135, 20}, getServerConfig(TerrainAspect).c_str());
-            GuiStatusBar({435, 480, 135, 20}, getServerConfig(TerrainHeight).c_str());
-            GuiStatusBar({435, 505, 135, 20}, getServerConfig(StartingSeason).c_str());
-            GuiStatusBar({435, 530, 135, 20}, getServerConfig(YearLength).c_str());
-            GuiStatusBar({435, 555, 135, 20}, getServerConfig(Precipitation).c_str());
+            GuiStatusBar({435, 430, 135, 20}, getServerConfig(TerrainAspect).c_str());
+            GuiStatusBar({435, 455, 135, 20}, getServerConfig(TerrainHeight).c_str());
+            GuiStatusBar({435, 480, 135, 20}, getServerConfig(StartingSeason).c_str());
+            GuiStatusBar({435, 505, 135, 20}, getServerConfig(YearLength).c_str());
+            GuiStatusBar({435, 530, 135, 20}, getServerConfig(Precipitation).c_str());
+            GuiStatusBar({435, 555, 135, 20}, getServerConfig(DayLength).c_str());
 
-            GuiLabel({585, 380, 160, 20}, getServerConfigName(DayLength).c_str());
-            GuiLabel({585, 405, 160, 20}, getServerConfigName(StructureDecay).c_str());
-            GuiLabel({585, 430, 160, 20}, getServerConfigName(InvasionDificulty).c_str());
-            GuiLabel({585, 455, 160, 20}, getServerConfigName(MonsterDensity).c_str());
-            GuiLabel({585, 480, 160, 20}, getServerConfigName(MonsterPopulation).c_str());
-            GuiLabel({585, 505, 160, 20}, getServerConfigName(InvasionDificulty).c_str());
-            GuiLabel({585, 530, 160, 20}, getServerConfigName(MonsterDensity).c_str());
-            GuiLabel({585, 555, 160, 20}, getServerConfigName(MonsterPopulation).c_str());
+            GuiLabel({585, 380, 160, 20}, getServerConfigName(StructureDecay).c_str());
+            GuiLabel({585, 405, 160, 20}, getServerConfigName(InvasionDificulty).c_str());
+            GuiLabel({585, 430, 160, 20}, getServerConfigName(MonsterDensity).c_str());
+            GuiLabel({585, 455, 160, 20}, getServerConfigName(MonsterPopulation).c_str());
+            GuiLabel({585, 480, 160, 20}, getServerConfigName(InvasionDificulty).c_str());
+            GuiLabel({585, 505, 160, 20}, getServerConfigName(MonsterDensity).c_str());
+            GuiLabel({585, 530, 160, 20}, getServerConfigName(MonsterPopulation).c_str());
 
-            GuiStatusBar({750, 380, 80, 20}, getServerConfig(DayLength).c_str());
-            GuiStatusBar({750, 405, 80, 20}, getServerConfig(StructureDecay).c_str());
-            GuiStatusBar({750, 430, 80, 20}, getServerConfig(InvasionDificulty).c_str());
-            GuiStatusBar({750, 455, 80, 20}, getServerConfig(MonsterDensity).c_str());
-            GuiStatusBar({750, 480, 80, 20}, getServerConfig(MonsterPopulation).c_str());
-            GuiStatusBar({750, 505, 80, 20}, getServerConfig(InvasionDificulty).c_str());
-            GuiStatusBar({750, 530, 80, 20}, getServerConfig(MonsterDensity).c_str());
-            GuiStatusBar({750, 555, 80, 20}, getServerConfig(MonsterPopulation).c_str());
+            GuiStatusBar({750, 380, 80, 20}, getServerConfig(StructureDecay).c_str());
+            GuiStatusBar({750, 405, 80, 20}, getServerConfig(InvasionDificulty).c_str());
+            GuiStatusBar({750, 430, 80, 20}, getServerConfig(MonsterDensity).c_str());
+            GuiStatusBar({750, 455, 80, 20}, getServerConfig(MonsterPopulation).c_str());
+            GuiStatusBar({750, 480, 80, 20}, getServerConfig(InvasionDificulty).c_str());
+            GuiStatusBar({750, 505, 80, 20}, getServerConfig(MonsterDensity).c_str());
+            GuiStatusBar({750, 530, 80, 20}, getServerConfig(MonsterPopulation).c_str());
         }
     }
 

@@ -434,7 +434,7 @@ namespace Gui
         if(GuiButton({770, 10, 90, 20}, "About")) about = true;
         if(about)
         {
-            if(GuiMessageBox({275, 200, 350, 175}, "#191#About", "Dedi: Aska Dedicated Server Manager \nGithub: https://github.com/at67/Dedi\nAuthor: at67", "OK") >= 0)
+            if(GuiMessageBox({275, 200, 350, 175}, "#191#About", "Dedi: Aska Dedicated Server Manager \nGithub: https://github.com/at67/Dedi\nAuthor: at67\nVersion: v0.1", "OK") >= 0)
             {
                 about = false;
             }
