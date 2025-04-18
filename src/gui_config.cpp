@@ -18,7 +18,7 @@ namespace Gui
     // Dedi config
     static GuiEntry _dediConfig[NumDediEntries] =
     {
-        {"InstallPath",     "Install path, (don't install Dedi into your Aska or Aska Dedicated Server folders!)",  "",      "c:/Dedi", "", TextBox, false, 0, false, STATE_NORMAL,   0, ""},
+        {"InstallPath",     "Install path, (don't install Dedi into your Aska or Aska Dedicated Server folders!)",  "",      ".",       "", TextBox, false, 0, false, STATE_NORMAL,   0, ""},
         {"StylesFolder",    "Styles folder, (you should never need to modify this)",                                "",      "styles",  "", TextBox, false, 0, false, STATE_NORMAL,   0, ""},
         {"SavesFolder",     "Saves folder, (you should never need to modify this)",                                 "",      "saves",   "", TextBox, false, 0, false, STATE_NORMAL,   0, ""},
         {"BackupFolder",    "Backup folder, (you should never need to modify this)",                                "",      "backup",  "", TextBox, false, 0, false, STATE_NORMAL,   0, ""},
