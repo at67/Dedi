@@ -80,6 +80,11 @@ namespace Win
         return false;
     }
 
+    bool delFile(const std::string& path)
+    {
+        return DeleteFile(path.c_str());
+    }
+
     bool moveFile(const std::string& src, const std::string& dst, bool overwrite)
     {
         return MoveFileEx(src.c_str(), dst.c_str(), overwrite ? MOVEFILE_REPLACE_EXISTING : 0);
@@ -90,7 +95,49 @@ namespace Win
         return CopyFile(src.c_str(), dst.c_str(), !overwrite);
     }
 
-    bool createDirectory(const std::string& path)
+    int getFileCount(const std::string& path)
+    {
+        DIR* dir;
+        if((dir = opendir(path.c_str())) == nullptr) return 0;
+
+        int count = 0;
+        struct dirent* ent;
+        while((ent = readdir(dir)) != nullptr)
+        {
+            if(ent->d_type == DT_DIR) continue;
+
+            if(ent->d_type == DT_REG) count++;
+        }
+
+        closedir(dir);
+
+        return count;
+    }
+
+    int getFolderCount(const std::string& path)
+    {
+        DIR* dir;
+        if((dir = opendir(path.c_str())) == nullptr) return 0;
+
+        int count = 0;
+        struct dirent* ent;
+        while((ent = readdir(dir)) != nullptr)
+        {
+            if(ent->d_type == DT_REG) continue;
+
+            if(ent->d_type == DT_DIR)
+            {
+                if(std::string(ent->d_name) == "."  ||  std::string(ent->d_name) == "..") continue;
+                count++;
+            }
+        }
+
+        closedir(dir);
+
+        return count;
+    }
+
+    bool createFolder(const std::string& path)
     {
         bool result = CreateDirectory(path.c_str(), nullptr);
         if(!result)
@@ -107,8 +154,8 @@ namespace Win
         return result;
     }
 
-    // Only copies files in a directory, NOT sub-directories!
-    bool copyDirectory(const std::string& src, const std::string& dst)
+    // Only copies files in a folder, NOT sub-folders!
+    bool copyFolder(const std::string& src, const std::string& dst)
     {
         DIR* dir;
         if((dir = opendir(src.c_str())) == nullptr) return false;
@@ -130,12 +177,36 @@ namespace Win
         return true;
     }
 
-    bool getFilenames(const std::string& path, const std::string& search, std::vector<std::string>& filenames)
+    // Deletes all files in a folder and the folder itself, (if it can), but NOT sub-folders!
+    bool delFolder(const std::string& path)
     {
         DIR* dir;
         if((dir = opendir(path.c_str())) == nullptr) return false;
 
-        filenames.clear();
+        struct dirent* ent;
+        while((ent = readdir(dir)) != nullptr)
+        {
+            if(ent->d_type == DT_DIR) continue;
+
+            if(ent->d_type == DT_REG)
+            {
+                std::string file = std::string(ent->d_name);
+                delFile(path + "/" + file);
+            }
+        }
+
+        closedir(dir);
+
+        return RemoveDirectory(path.c_str());
+    }
+
+    // Returns file names WITHOUT search terms, (i.e trimming extensions)
+    bool getFileNames(const std::string& path, const std::string& search, std::vector<std::string>& files)
+    {
+        DIR* dir;
+        if((dir = opendir(path.c_str())) == nullptr) return false;
+
+        files.clear();
 
         struct dirent* ent;
         while((ent = readdir(dir)) != nullptr)
@@ -149,19 +220,46 @@ namespace Win
                 
                 std::string ext = search;
                 Util::lower(ext);
-                size_t epos = filename.find(search);
-                if(epos != std::string::npos)
-                {
-                    filenames.push_back(filename.substr(0, epos));
-                }
+                size_t pos = filename.find(ext);
+                if(pos != std::string::npos) files.push_back(filename.substr(0, pos));
             }
         }
 
         closedir(dir);
 
-        if(filenames.size() == 0) return false;
+        return !(files.size() == 0);
+    }
 
-        return true;
+    // Returns FULL folder names
+    bool getFolderNames(const std::string& path, const std::string& search, std::set<std::string>& folders)
+    {
+        DIR* dir;
+        if((dir = opendir(path.c_str())) == nullptr) return false;
+
+        folders.clear();
+
+        struct dirent* ent;
+        while((ent = readdir(dir)) != nullptr)
+        {
+            if(ent->d_type == DT_REG) continue;
+
+            if(ent->d_type == DT_DIR)
+            {
+                if(std::string(ent->d_name) == "."  ||  std::string(ent->d_name) == "..") continue;
+
+                std::string folder = std::string(ent->d_name);
+                Util::lower(folder);
+                
+                std::string pat = search;
+                Util::lower(pat);
+                size_t pos = folder.find(pat);
+                if(pos != std::string::npos) folders.insert(folder);
+            }
+        }
+
+        closedir(dir);
+
+        return !(folders.size() == 0);
     }
 
     bool createProcess(const std::string& name, const std::string& commandLine)

@@ -18,11 +18,13 @@ namespace Gui
     // Dedi config
     static GuiEntry _dediConfig[NumDediEntries] =
     {
-        {"InstallPath",  "Install path, (don't install Dedi into your Aska or Aska Dedicated Server folders!)",  "", "c:/Dedi", "", TextBox, false, 0, false, STATE_NORMAL, 0, ""},
-        {"StylesFolder", "Styles folder, (you should never need to modify this)",                                "", "styles",  "", TextBox, false, 0, false, STATE_NORMAL, 0, ""},
-        {"SavesFolder",  "Saves folder, (you should never need to modify this)",                                 "", "saves",   "", TextBox, false, 0, false, STATE_NORMAL, 0, ""},
-        {"BackupFolder", "Backup folder, (you should never need to modify this)",                                "", "backup",  "", TextBox, false, 0, false, STATE_NORMAL, 0, ""},
-        {"InitialStyle", "Startup style, choose one from the Styles button list",                                "", "Mono",    "", TextBox, false, 0, false, STATE_NORMAL, 0, ""}
+        {"InstallPath",     "Install path, (don't install Dedi into your Aska or Aska Dedicated Server folders!)",  "",      "c:/Dedi", "", TextBox, false, 0, false, STATE_NORMAL,   0, ""},
+        {"StylesFolder",    "Styles folder, (you should never need to modify this)",                                "",      "styles",  "", TextBox, false, 0, false, STATE_NORMAL,   0, ""},
+        {"SavesFolder",     "Saves folder, (you should never need to modify this)",                                 "",      "saves",   "", TextBox, false, 0, false, STATE_NORMAL,   0, ""},
+        {"BackupFolder",    "Backup folder, (you should never need to modify this)",                                "",      "backup",  "", TextBox, false, 0, false, STATE_NORMAL,   0, ""},
+        {"InitialStyle",    "Startup style, choose one from the Styles button list",                                "",      "Mono",    "", TextBox, false, 0, false, STATE_NORMAL,   0, ""},
+        {"MaxArchiveSaves", "Maximum number of archive saves",                                                      "0;20",  "5",       "", Spinner, false, 0, false, STATE_NORMAL, 300, ""},
+        {"MaxUsersSaves",   "Maximum number of users saves",                                                        "0;50",  "10",      "", Spinner, false, 0, false, STATE_NORMAL, 300, ""}
     };
 
     // Steam config
@@ -260,6 +262,26 @@ namespace Gui
                         configEntries[i]._timeout.update(configEntries[i]._toggle);
                         (configEntries[i]._toggle) ? GuiLock() : GuiUnlock(); // lock out other controls
                     }
+                    configEntries[i]._state = GuiGetLocalState();
+                }
+                break;
+
+                // TODO: uses option as an integer value, a bit hacky but will do for now
+                case Spinner:
+                {
+                    int min = 0, max = 0, itemCount = 0;
+                    const char **items = GuiTextSplit(configEntries[i]._options.c_str(), ';', &itemCount, nullptr);
+                    if(itemCount == 2)
+                    {
+                        min = std::stoi(items[0], nullptr, 10);
+                        max = std::stoi(items[1], nullptr, 10);
+                    }
+
+                    if(GuiSpinner({float(x), float(y) + float(i-startEntry)*30, 180, 25}, "", &configEntries[i]._option, min, max, configEntries[i]._toggle))
+                    {
+                        configEntries[i]._toggle = !configEntries[i]._toggle;
+                    }
+                    Util::strcpy(configEntries[i]._value, std::to_string(configEntries[i]._option), MAX_CONFIG_TEXT, _F, _L);
                     configEntries[i]._state = GuiGetLocalState();
                 }
                 break;

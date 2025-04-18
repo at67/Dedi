@@ -41,11 +41,19 @@ namespace Gui
             if(guiEntries[i]._type == CheckBox) guiEntries[i]._toggle = (std::string(guiEntries[i]._default) == "true") ? true : false;
 
             // Update option
-            int itemCount = 0;
-            const char **items = GuiTextSplit(guiEntries[i]._options.c_str(), ';', &itemCount, nullptr);
-            for(int j=0; j<itemCount; j++)
+            if(guiEntries[i]._type == Spinner)
             {
-                if(Util::stricmp(items[j], guiEntries[i]._value) == 0) guiEntries[i]._option = j;
+                // TODO: uses option as an integer value, a bit hacky but will do for now
+                guiEntries[i]._option = std::stoi(guiEntries[i]._default, nullptr, 10);
+            }
+            else
+            {
+                int itemCount = 0;
+                const char **items = GuiTextSplit(guiEntries[i]._options.c_str(), ';', &itemCount, nullptr);
+                for(int j=0; j<itemCount; j++)
+                {
+                    if(Util::stricmp(items[j], guiEntries[i]._value) == 0) guiEntries[i]._option = j;
+                }
             }
         }
     }
@@ -81,11 +89,19 @@ namespace Gui
             if(guiEntries[i]._type == CheckBox) guiEntries[i]._toggle = (value == "true") ? true : false;
 
             // Update option
-            int itemCount = 0;
-            const char **items = GuiTextSplit(guiEntries[i]._options.c_str(), ';', &itemCount, nullptr);
-            for(int j=0; j<itemCount; j++)
+            if(guiEntries[i]._type == Spinner)
             {
-                if(Util::stricmp(items[j], guiEntries[i]._value) == 0) guiEntries[i]._option = j;
+                // TODO: uses option as an integer value for spinners, a bit hacky but will do for now
+                guiEntries[i]._option = std::stoi(guiEntries[i]._value, nullptr, 10);
+            }
+            else
+            {
+                int itemCount = 0;
+                const char **items = GuiTextSplit(guiEntries[i]._options.c_str(), ';', &itemCount, nullptr);
+                for(int j=0; j<itemCount; j++)
+                {
+                    if(Util::stricmp(items[j], guiEntries[i]._value) == 0) guiEntries[i]._option = j;
+                }
             }
 
             if(userFunc) userFunc(guiEntries, i);
@@ -122,7 +138,7 @@ namespace Gui
         _styleIndices.clear();
 
         _stylesFolder = getDediConfig(InstallPath) + "/" + getDediConfig(StylesFolder);
-        Win::getFilenames(_stylesFolder, ".rgs", _styleNames);
+        Win::getFileNames(_stylesFolder, ".rgs", _styleNames);
         _styleCount = int(_styleNames.size());
 
         // Create styles list
@@ -377,6 +393,7 @@ namespace Gui
             default: break;
         }
 
+        if(_page != Server) handleServer(false);
         handleStatus();
 
         switch(_page)

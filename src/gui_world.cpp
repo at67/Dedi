@@ -119,7 +119,7 @@ namespace Gui
         bool found = Util::fileExists(backup + "/worldgen");
         if(!found)
         {
-            Win::createDirectory(backup);
+            Win::createFolder(backup);
             std::string worldGen = getWorldGenFile();
             if(!Win::copyFile(worldGen, backup + "/worldgen", true)) return false;
             log(Util::Success, stderr, _f, _F, _L, "Backed up %s to %s", worldGen.c_str(), backup.c_str());

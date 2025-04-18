@@ -1,5 +1,6 @@
 ﻿#pragma once
 
+#include <set>
 #include <string>
 #include <vector>
 
@@ -13,12 +14,19 @@ namespace Win
     bool shellExecute(const std::string& url);
     bool downloadLink(const std::string& url, const std::string& file);
 
+    bool delFile(const std::string& path);
     bool moveFile(const std::string& src, const std::string& dst, bool overwrite=false);
     bool copyFile(const std::string& src, const std::string& dst, bool overwrite=false);
-    bool createDirectory(const std::string& path);
-    bool copyDirectory(const std::string& src, const std::string& dst);
 
-    bool getFilenames(const std::string& path, const std::string& search, std::vector<std::string>& filenames);
+    int getFileCount(const std::string& path);
+    int getFolderCount(const std::string& path);
+
+    bool createFolder(const std::string& path);
+    bool copyFolder(const std::string& src, const std::string& dst);
+    bool delFolder(const std::string& path);
+
+    bool getFileNames(const std::string& path, const std::string& search, std::vector<std::string>& files);
+    bool getFolderNames(const std::string& path, const std::string& search, std::set<std::string>& folders);
 
     bool createProcess(const std::string& name, const std::string& command);
     bool endProcess();

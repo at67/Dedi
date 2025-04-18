@@ -24,7 +24,7 @@
 
 namespace Gui
 {
-    enum GuiType {CheckBox=0, TextBox, DropdownBox};
+    enum GuiType {CheckBox=0, TextBox, DropdownBox, Spinner};
 
 
     class GuiStateTimeout
@@ -93,7 +93,7 @@ namespace Gui
 
     void handle();
 
-    void handleServer();
+    void handleServer(bool render=true);
     void handleServerEntries();
 
     void handleConfig();

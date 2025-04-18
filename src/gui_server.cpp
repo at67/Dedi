@@ -82,7 +82,7 @@ namespace Gui
         bool found = Util::fileExists(backup + "/" + getAskaConfig(AskaSvrBat));
         if(!found)
         {
-            Win::createDirectory(backup);
+            Win::createFolder(backup);
             Win::copyFile(_appPath + "/" + getAskaConfig(AskaSvrBat), backup + "/" + getAskaConfig(AskaSvrBat), true);
         }
 
@@ -114,7 +114,7 @@ namespace Gui
         bool found = Util::fileExists(backup + "/" + getAskaConfig(AskaSvrProps));
         if(!found)
         {
-            Win::createDirectory(backup);
+            Win::createFolder(backup);
             Win::copyFile(_appPath + "/" + getAskaConfig(AskaSvrProps), backup + "/" + getAskaConfig(AskaSvrProps), true);
         }
 
@@ -181,17 +181,47 @@ namespace Gui
         return saves + "/server/savegame_" + getServerConfig(SaveId);
     }
 
-    bool backupSave()
+    std::string getOldestSave(const std::string& saves)
     {
+        std::set<std::string> folders;
+        if(!Win::getFolderNames(saves, getServerConfig(SaveId), folders)) return "";
+
+        return *folders.begin();
+    }
+
+    bool delOldestSave(const std::string& folder, int maxFiles)
+    {
+        // Saves folder
+        std::string saves = getDediConfig(InstallPath) + "/" + getDediConfig(SavesFolder) + "/" + folder;
+
+        if(Win::getFolderCount(saves) > maxFiles)
+        {
+            std::string oldest = getOldestSave(saves);
+            if(oldest.size()) return Win::delFolder(saves + "/" + oldest);
+        }
+
+        return false;
+    }
+
+    bool backupSave(const std::string& folder)
+    {
+        // Saves folder
         std::string saves = getDediConfig(InstallPath) + "/" + getDediConfig(SavesFolder);
-        Win::createDirectory(saves);
-        saves += "/" + getServerConfig(SaveId);
-        Win::createDirectory(saves);
+        Win::createFolder(saves);
+
+        // User folder
+        saves += "/" + folder;
+        Win::createFolder(saves);
+
+        // Save folder
+        saves += "/" + getServerConfig(SaveId) + "_" + Util::getDateTime();
+        Win::createFolder(saves);
+
         std::string save = getSaveFile();
-        bool success = Win::copyDirectory(save, saves);
+        bool success = Win::copyFolder(save, saves);
         if(success) log(Util::Success, stderr, _f, _F, _L, "Backed up Save from %s to %s", save.c_str(), saves.c_str());
 
-        return true;
+        return success;
     }
 
     bool checkPlayerConnected()
@@ -206,7 +236,7 @@ namespace Gui
         Util::logStatus("Player : " + player + " : connected");
         _playerList.insert(player);
 
-        backupSave();
+        if(backupSave("users")) delOldestSave("users", std::stoi(getDediConfig(MaxUsersSaves), nullptr, 10));
 
         return true;
     }
@@ -367,8 +397,14 @@ namespace Gui
         if(!ready) GuiSetState(STATE_NORMAL);
     }
 
-    void handleServer()
+    void handleServer(bool render)
     {
+        //if(_ticks % 120 == 0)
+        //{
+        //    if(backupSave("users"))   delOldestSave("users",   std::stoi(getDediConfig(MaxUsersSaves), nullptr, 10));
+        //    if(backupSave("archive")) delOldestSave("archive", std::stoi(getDediConfig(MaxArchiveSaves), nullptr, 10));
+        //}
+
         // Check once a second
         if(++_ticks % 60 == 0  ||  changedPage())
         {
@@ -387,7 +423,12 @@ namespace Gui
             checkPlayerConnected();
             checkPlayerDisconnected();
 
-            if(checkWorldSaved()) Util::logStatus("World saved successfully!");
+            if(checkWorldSaved())
+            {
+                if(backupSave("archive")) delOldestSave("archive", std::stoi(getDediConfig(MaxArchiveSaves), nullptr, 10));
+
+                Util::logStatus("World saved successfully!");
+            }
         }
 
         if(!_serverStarted)
@@ -420,6 +461,8 @@ namespace Gui
             _activeTime = 0;
             _playerList.clear();
         }
+
+        if(!render) return;
 
         GuiPanel({10.0f, 40.0f, 850.0f, 705.0f}, "Server");
 

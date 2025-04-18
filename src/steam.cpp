@@ -92,10 +92,10 @@ namespace Steam
     bool install()
     {
         // Destination folders
-        Win::createDirectory(Gui::getDediConfig(Gui::InstallPath));
+        Win::createFolder(Gui::getDediConfig(Gui::InstallPath));
         std::string steamCmdPath = Gui::getDediConfig(Gui::InstallPath) + "/" + Gui::getSteamCmdConfig(Gui::PathSteamCmd);
         std::string steamCmdExec = steamCmdPath + "/steamcmd.zip";
-        Win::createDirectory(steamCmdPath);
+        Win::createFolder(steamCmdPath);
 
         // SteamCmd
         Win::downloadLink(Gui::getSteamCmdConfig(Gui::HTTPSteamCmd), steamCmdExec);

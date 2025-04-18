@@ -6,6 +6,8 @@
 
 #include <fstream>
 #include <iostream>
+#include <sstream>
+#include <iomanip>
 #include <chrono>
 #include <thread>
 #include <algorithm>
@@ -80,6 +82,17 @@ namespace Util
     void sleep_ms(uint64_t ms)
     {
         std::this_thread::sleep_for(std::chrono::milliseconds(ms));
+    }
+
+    std::string getDateTime()
+    {
+        auto now = std::chrono::system_clock::now();
+        auto now_time_t = std::chrono::system_clock::to_time_t(now);
+        auto local_time = std::localtime(&now_time_t);
+
+        std::stringstream timeStamp;
+        timeStamp << std::put_time(local_time, "%Y-%b-%d_%H-%M-%S");
+        return timeStamp.str();
     }
 
     void logStatus(const std::string& text)
@@ -260,7 +273,7 @@ namespace Util
             // Folder
             if(mz_zip_reader_is_file_a_directory(&zipArchive, i))
             {
-                if(!Win::createDirectory(path)) return false;
+                if(!Win::createFolder(path)) return false;
                 continue;
             }
 

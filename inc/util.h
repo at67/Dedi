@@ -68,6 +68,8 @@ namespace Util
 
     void sleep_ms(uint64_t ms);
 
+    std::string getDateTime();
+
     void logStatus(const std::string& text);
 
     bool fileExists(const std::string& filename);
