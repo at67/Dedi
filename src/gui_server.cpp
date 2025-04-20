@@ -19,10 +19,11 @@ namespace Gui
     static bool _foundSteamToken = false;
 
     static bool _foundAska       = false;
-    static bool _foundAskaBat    = false;
     static bool _foundAskaProps  = false;
 
-    static bool _serverStarted  = false;
+    static bool _steamCmdInstalled = false;
+    static bool _steamCmdUpdated   = false;
+    static bool _serverStarted     = false;
 
     static uint64_t _ticks      = 0;
     static uint64_t _upTime     = 0;
@@ -48,7 +49,7 @@ namespace Gui
     bool checkSteamCmd()
     {
         bool found = Util::fileExists(getDediConfig(InstallPath) + "/" + getSteamCmdConfig(PathSteamCmd) + "/" + getSteamCmdConfig(ExecSteamCmd));
-        if(!found  &&  Steam::getCmdOp() == Steam::CmdIdle) Steam::setCmdOp(Steam::CmdInit);
+        //if(!found  &&  Steam::getCmdOp() == Steam::CmdIdle) Steam::setCmdOp(Steam::CmdInit);
         return found;
     }
 
@@ -236,7 +237,7 @@ namespace Gui
         Util::logStatus("Player : " + player + " : connected");
         _playerList.insert(player);
 
-        if(backupSave("users")) delOldestSave("users", std::stoi(getDediConfig(MaxUsersSaves), nullptr, 10));
+        if(backupSave("user")) delOldestSave("user", std::stoi(getDediConfig(MaxUserSaves), nullptr, 10));
 
         return true;
     }
@@ -435,37 +436,57 @@ namespace Gui
 
     void handleServerButtons()
     {
-        static bool start = false;
+        std::string button;
 
-        bool ready = _foundSteam & _foundSteamCmd & _foundSteamToken & _foundAska & _foundAskaBat & _foundAskaProps;
-
-        if(!ready) GuiSetState(STATE_DISABLED);
-
-        std::string button = _serverStarted ? "Stop" : "Start";
-        if(GuiButton({390, 755, 90, 20}, button.c_str())) start = !start;
-        if(start)
+        // Full SteamCmd install
+        if(!_foundSteamCmd)
         {
-            start = false;
-            if(_serverStarted)
+            static bool install = false;
+
+            button = "Install";
+            if(GuiButton({390, 755, 90, 20}, button.c_str())) install = !install;
+            if(install)
             {
-                closeServer();
-            }
-            else
-            {
-                if(!Util::fileExists(getDediConfig(InstallPath) + "/" + getAskaConfig(AskaSvrProps))) saveServerProperties();
-                startServer();
+                install = false;
+                GuiSetState(STATE_DISABLED);
+                Steam::setCmdOp(Steam::CmdInit);
             }
         }
+        // Start-Stop server
+        else
+        {
+            static bool start = false;
 
-        if(!ready) GuiSetState(STATE_NORMAL);
+            bool ready = _foundSteam & _foundSteamCmd & _foundSteamToken & _foundAska & _foundAskaProps & _steamCmdInstalled & _steamCmdUpdated;
+            if(!ready) GuiSetState(STATE_DISABLED);
+
+            button = _serverStarted ? "Stop" : "Start";
+            if(GuiButton({390, 755, 90, 20}, button.c_str())) start = !start;
+            if(start)
+            {
+                start = false;
+                if(_serverStarted)
+                {
+                    closeServer();
+                }
+                else
+                {
+                    // Generate server properties, if it doesn't exist, before starting server
+                    if(!Util::fileExists(getDediConfig(InstallPath) + "/" + getAskaConfig(AskaSvrProps))) saveServerProperties();
+                    startServer();
+                }
+            }
+
+            if(!ready) GuiSetState(STATE_NORMAL);
+        }
     }
 
     void handleServer(bool render)
     {
         //if(_ticks % 120 == 0)
         //{
-        //    if(backupSave("users"))   delOldestSave("users",   std::stoi(getDediConfig(MaxUsersSaves), nullptr, 10));
-        //    if(backupSave("archive")) delOldestSave("archive", std::stoi(getDediConfig(MaxArchiveSaves), nullptr, 10));
+        //    if(backupSave("user"))   delOldestSave("user",   std::stoi(getDediConfig(MaxUserSaves), nullptr, 10));
+        //    if(backupSave("server")) delOldestSave("server", std::stoi(getDediConfig(MaxServerSaves), nullptr, 10));
         //}
 
         // Check once a second
@@ -476,19 +497,21 @@ namespace Gui
             _foundSteamToken = checkSteamToken();
 
             _foundAska      = checkAska();
-            _foundAskaBat   = checkAskaBat();
             _foundAskaProps = checkAskaProps();
 
             _steamConnected = (!_steamConnected) ? checkSteamConnected() : !checkSteamClosed();
             _chatConnected  = (!_chatConnected)  ? checkChatConnected()  : !checkChatDisconnected();
             _worldActive    = (!_worldActive)    ? checkWorldStarted()   : !checkWorldStopped();
 
+            _steamCmdInstalled = Steam::getSteamCmdInstalled();
+            _steamCmdUpdated   = Steam::getSteamCmdUpdated();
+
             checkPlayerConnected();
             checkPlayerDisconnected();
 
             if(checkWorldSaved())
             {
-                if(backupSave("archive")) delOldestSave("archive", std::stoi(getDediConfig(MaxArchiveSaves), nullptr, 10));
+                if(backupSave("server")) delOldestSave("server", std::stoi(getDediConfig(MaxServerSaves), nullptr, 10));
 
                 Util::logStatus("World saved successfully!");
             }
@@ -530,10 +553,10 @@ namespace Gui
         GuiPanel({10.0f, 40.0f, 850.0f, 705.0f}, "Server");
 
         drawEnabledText("Steam installed",                       80,  _foundSteam);
-        drawEnabledText("SteamCmd installed",                    110, _foundSteamCmd);
-        drawEnabledText("Steam Authentication Token",            140, _foundSteamToken);
-        drawEnabledText("Aska Dedicated Server installed",       170, _foundAska);
-        drawEnabledText("Aska Server Batch file installed",      200, _foundAskaBat);
+        drawEnabledText("SteamCmd installed",                    110, _steamCmdInstalled);
+        drawEnabledText("SteamCmd updated",                      140, _steamCmdUpdated);
+        drawEnabledText("Steam Authentication Token",            170, _foundSteamToken);
+        drawEnabledText("Aska Dedicated Server installed",       200, _foundAska);
         drawEnabledText("Aska Server Properties file installed", 230, _foundAskaProps);
         drawEnabledText("Aska Server connected to Steam",        260, _steamConnected);
         drawEnabledText("Aska Server connected to Chat",         290, _chatConnected);

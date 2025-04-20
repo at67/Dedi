@@ -37,28 +37,36 @@ namespace Gui
     }
 
 
+    bool selectOption(GuiEntry& entry)
+    {
+        int itemCount = 0;
+        const char **items = GuiTextSplit(entry._options.c_str(), ';', &itemCount, nullptr);
+        for(int j=0; j<itemCount; j++)
+        {
+            if(Util::stricmp(items[j], entry._value) == 0)
+            {
+                entry._option = j;
+                return true;
+            }
+        }
+
+        return false;
+    }
+
     void defaultSection(const std::string& section, GuiEntry guiEntries[], int numEntries)
     {
         // Keys and values
         for(int i=0; i<numEntries; i++)
         {
             Util::strcpy(guiEntries[i]._value, guiEntries[i]._default, MAX_CONFIG_TEXT, _F, _L);
-            if(guiEntries[i]._type == CheckBox) guiEntries[i]._toggle = (std::string(guiEntries[i]._default) == "true") ? true : false;
 
-            // Update option
-            if(guiEntries[i]._type == Spinner)
+            switch(guiEntries[i]._type)
             {
-                // TODO: uses option as an integer value, a bit hacky but will do for now
-                guiEntries[i]._option = std::stoi(guiEntries[i]._default, nullptr, 10);
-            }
-            else
-            {
-                int itemCount = 0;
-                const char **items = GuiTextSplit(guiEntries[i]._options.c_str(), ';', &itemCount, nullptr);
-                for(int j=0; j<itemCount; j++)
-                {
-                    if(Util::stricmp(items[j], guiEntries[i]._value) == 0) guiEntries[i]._option = j;
-                }
+                case CheckBox:    guiEntries[i]._toggle = (std::string(guiEntries[i]._default) == "true") ? true : false; break;
+                case Spinner:     guiEntries[i]._option = std::stoi(guiEntries[i]._default, nullptr, 10);                 break;
+                case DropdownBox: selectOption(guiEntries[i]);                                                            break;
+
+                default: break;
             }
         }
     }
@@ -90,23 +98,13 @@ namespace Gui
             if(value == "!!!!") return false;
             Util::strcpy(guiEntries[i]._value, value, MAX_CONFIG_TEXT, _F, _L);
 
-            // CheckBox
-            if(guiEntries[i]._type == CheckBox) guiEntries[i]._toggle = (value == "true") ? true : false;
+            switch(guiEntries[i]._type)
+            {
+                case CheckBox:    guiEntries[i]._toggle = (value == "true") ? true : false;             break;
+                case Spinner:     guiEntries[i]._option = std::stoi(guiEntries[i]._value, nullptr, 10); break;
+                case DropdownBox: selectOption(guiEntries[i]);                                          break;
 
-            // Update option
-            if(guiEntries[i]._type == Spinner)
-            {
-                // TODO: uses option as an integer value for spinners, a bit hacky but will do for now
-                guiEntries[i]._option = std::stoi(guiEntries[i]._value, nullptr, 10);
-            }
-            else
-            {
-                int itemCount = 0;
-                const char **items = GuiTextSplit(guiEntries[i]._options.c_str(), ';', &itemCount, nullptr);
-                for(int j=0; j<itemCount; j++)
-                {
-                    if(Util::stricmp(items[j], guiEntries[i]._value) == 0) guiEntries[i]._option = j;
-                }
+                default: break;
             }
 
             if(userFunc) userFunc(guiEntries, i);
@@ -133,6 +131,38 @@ namespace Gui
             GuiTooltip({float(x), float(y) + float(i-startEntry)*30, 180, 20});
         }
         GuiDisableTooltip();
+    }
+
+    void loadStyle()
+    {
+        // Load selected style
+        GuiLoadStyleDefault();
+        if(_styleIndex >= 0  &&  _styleIndex < _styleNames.size())
+        {
+            GuiLoadStyle((_stylesFolder + "/" + _styleNames[_styleIndex] + ".rgs").c_str());
+        }
+        Status::reset(GuiGetFont());
+    }
+
+    bool setStyle(int style)
+    {
+        if(_styleIndex < 0  ||  _styleIndex >= _styleNames.size()) return false;
+
+        loadStyle();
+
+        return true;
+    }
+
+    bool setStyle(const std::string& s)
+    {
+        std::string style = s;
+        Util::lower(style);
+        if(_styleIndices.find(style) == _styleIndices.end()) return false;
+
+        _styleIndex = _styleIndices[style];
+        loadStyle();
+
+        return true;
     }
 
     void initStyles(int style)
@@ -183,18 +213,11 @@ namespace Gui
             GuiSetStyle(LISTVIEW, LIST_ITEMS_HEIGHT, 16);
             GuiListView({10, 750-listViewHeight, 90, listViewHeight}, _styleList.c_str(), nullptr, &_styleIndex);
 
-            // Load selected style
-            GuiLoadStyleDefault();
-            if(_styleIndex >= 0  &&  _styleIndex < _styleNames.size())
-            {
-                GuiLoadStyle((_stylesFolder + "/" + _styleNames[_styleIndex] + ".rgs").c_str());
-            }
-
             // Close styles list after short amount of time
             if(getMiscOptions(EnableStylesTimeout)) timeout.update(_styles);
             _styles ? GuiLock() : GuiUnlock();
 
-            Status::reset(GuiGetFont());
+            loadStyle();
         }
     }
 
@@ -486,9 +509,11 @@ namespace Gui
         Win::initialise();
 
         SetTraceLogLevel(LOG_ERROR);
-        InitWindow(870, 785, "Aska Dedicated Server Launcher");
+        InitWindow(870, 785, "Dedi: Aska Dedicated Server Manager");
         SetTargetFPS(60);
         SetExitKey(KEY_NULL);
+
+        Win::setDarkMode(GetWindowHandle());
 
         Image icon = LoadImage("juggler.png");
         SetWindowIcon(icon);

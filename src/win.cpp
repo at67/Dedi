@@ -1,9 +1,14 @@
-﻿#include <win.h>
+﻿#ifndef DWMWA_USE_IMMERSIVE_DARK_MODE
+#define DWMWA_USE_IMMERSIVE_DARK_MODE 20
+#endif
+
+#include <win.h>
 #include <util.h>
 
 #include <windows.h>
 #include <shellapi.h>
 #include <Urlmon.h>
+#include <dwmapi.h>
 
 #include <dirent.h>
 
@@ -22,6 +27,13 @@ namespace Win
     {
         SetConsoleCtrlHandler(nullptr, true);
         SetEnvironmentVariable("SteamAppId", "1898300");
+    }
+
+    void setDarkMode(void* handle)
+    {
+        HWND hWnd = HWND(handle);
+        BOOL value = TRUE;
+        ::DwmSetWindowAttribute(hWnd, DWMWA_USE_IMMERSIVE_DARK_MODE, &value, sizeof(value));
     }
 
     bool getLastErrorStr(std::string& errorStr)

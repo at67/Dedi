@@ -9,6 +9,8 @@ namespace Win
 {
     void initialise();
 
+    void setDarkMode(void* handle);
+
     bool getLastErrorStr(std::string& errorStr);
 
     bool shellExecute(const std::string& url);

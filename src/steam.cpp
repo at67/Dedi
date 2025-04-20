@@ -9,8 +9,14 @@
 
 namespace Steam
 {
+    static bool _steamCmdInstalled = false;
+    static bool _steamCmdUpdated   = false;
+
     static CmdOp _cmdOp = CmdIdle;
 
+
+    bool getSteamCmdInstalled() {return _steamCmdInstalled;}
+    bool getSteamCmdUpdated()   {return _steamCmdUpdated;  }
 
     CmdOp getCmdOp() {return _cmdOp;}
     void setCmdOp(CmdOp cmdOp) {_cmdOp = cmdOp;}
@@ -69,7 +75,7 @@ namespace Steam
     bool wait(const std::string& match)
     {
         std::string line;
-        if(Win::matchConsoleText(match, line))
+        if(Win::matchConsoleText(match, line) != std::string::npos)
         {
             Win::sendConsoleText(Gui::getSteamCmdConfig(Gui::QuitSteamCmd));
             return true;
@@ -133,6 +139,7 @@ namespace Steam
                 if(wait(Gui::getSteamCmdConfig(Gui::CoupSteamCmd)))
                 {
                     _cmdOp = CmdIdle;
+                    _steamCmdUpdated = true;
                     Util::logStatus("Successfully updated SteamCmd");
                 }
             }
@@ -143,6 +150,7 @@ namespace Steam
                 if(wait(Gui::getSteamCmdConfig(Gui::DoneSteamCmd)))
                 {
                     _cmdOp = CmdUpdate;
+                    _steamCmdInstalled = true;
                     Util::logStatus("Successfully installed SteamCmd");
                 }
             }
@@ -162,6 +170,7 @@ namespace Steam
 
             case CmdInstall:
             {
+                _steamCmdInstalled = false;
                 install();
                 _cmdOp = CmdWaitDone;
             }
@@ -169,6 +178,15 @@ namespace Steam
 
             case CmdUpdate:
             {
+                if(!Util::fileExists(Gui::getDediConfig(Gui::InstallPath) + "/" + Gui::getSteamCmdConfig(Gui::PathSteamCmd) + "/" + Gui::getSteamCmdConfig(Gui::ExecSteamCmd)))
+                {
+                    _cmdOp = CmdIdle;
+                    return;
+                }
+
+                if(Util::pathExists(Gui::getDediConfig(Gui::InstallPath) + "/" + Gui::getSteamCmdConfig(Gui::PathSteamCmd) + "/Config")) _steamCmdInstalled = false;
+
+                _steamCmdUpdated = false;
                 update();
                 _cmdOp = CmdWaitCoup;
             }

@@ -6,7 +6,7 @@ int main(int argc, char* argv[])
 {
     Gui::initialise();
 
-    Steam::setCmdOp(Steam::CmdInit);
+    Steam::setCmdOp(Steam::CmdUpdate);
 
     while(!WindowShouldClose())
     {

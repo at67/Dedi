@@ -17,7 +17,10 @@
 
 
 #define MAX_CONFIG_TEXT      256
-#define CUSTOM_GAME_CONTROL   11
+
+#define GUI_STYLE_CONTROL      4
+#define CUSTOM_GAME_CONTROL   12
+
 #define NORMAL_GAME            0
 #define CUSTOM_GAME            1
 
@@ -77,6 +80,9 @@ namespace Gui
 
 
     int getTextPixels(const std::string& text);
+
+    bool setStyle(int style);
+    bool setStyle(const std::string& s);
 
     bool setWorldSeed();
 

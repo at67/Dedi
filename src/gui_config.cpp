@@ -24,7 +24,7 @@ namespace Gui
         {"BackupFolder",   "Backup Folder", "Backup folder, (you should never need to modify this)",                                "",      "backup", "", TextBox, false, 0, false, STATE_NORMAL,   0, ""},
         {"InitialStyle",   "Initial Style", "Startup style, choose one from the Styles button list",                                "",      "Mono",   "", TextBox, false, 0, false, STATE_NORMAL,   0, ""},
         {"MaxServerSaves", "Server Saves",  "Maximum number of server backup saves",                                                "1;20",  "5",      "", Spinner, false, 0, false, STATE_NORMAL, 300, ""},
-        {"MaxUsersSaves",  "Users Saves",   "Maximum number of users backup saves",                                                 "1;50",  "10",     "", Spinner, false, 0, false, STATE_NORMAL, 300, ""}
+        {"MaxUserSaves",   "User  Saves",   "Maximum number of user backup saves",                                                  "1;50",  "10",     "", Spinner, false, 0, false, STATE_NORMAL, 300, ""}
     };
 
     // Steam config
@@ -66,7 +66,7 @@ namespace Gui
     // Server config
     static GuiEntry _serverConfig[NumServerEntries] =
     {
-        {"DediName",            "Dedi Name",         "Name that identifies this server to Dedi", "",                          "",                "",                        TextBox,     false, 0, false, STATE_NORMAL,   0, ""},
+        {"DediName",            "Dedi Name",         "Name that identifies this server to Dedi", "",                          "Default",         "",                        TextBox,     false, 0, false, STATE_NORMAL,   0, ""},
         {"SaveId",              "Save Id",           "<id> from savegame_<id>",                  "",                          "",                "save id",                 TextBox,     false, 0, false, STATE_NORMAL,   0, ""},
         {"DisplayName",         "Display Name",      "Display name in session list",             "",                          "Default Session", "display name",            TextBox,     false, 0, false, STATE_NORMAL,   0, ""},
         {"ServerName",          "Server Name",       "Server name in session list",              "",                          "My Aska Server",  "server name",             TextBox,     false, 0, false, STATE_NORMAL,   0, ""},
@@ -237,7 +237,7 @@ namespace Gui
         return true;
     }
 
-    void handleConfigEntries(GuiEntry configEntries[], int x, int y, int startEntry, int endEntry)
+    void handleConfigEntries(GuiEntry configEntries[], int x, int y, int startEntry, int endEntry, const GuiEntryFunc& userFunc=nullptr)
     {
         for(auto i=endEntry; i>=startEntry; i--)
         {
@@ -250,6 +250,7 @@ namespace Gui
                 {
                     if(GuiTextBox({float(x), float(y) + float(i-startEntry)*30, 180, 25}, configEntries[i]._value, MAX_CONFIG_TEXT, configEntries[i]._toggle))
                     {
+                        if(userFunc) userFunc(configEntries, i);
                         configEntries[i]._toggle = !configEntries[i]._toggle;
                     }
                     configEntries[i]._state = GuiGetLocalState();
@@ -261,6 +262,7 @@ namespace Gui
                     if(configEntries[i]._toggle) GuiUnlock();
                     if(GuiDropdownBox({float(x), float(y) + float(i-startEntry)*30, 180, 25}, configEntries[i]._options.c_str(), &configEntries[i]._option, configEntries[i]._toggle, configEntries[i]._value))
                     {
+                        if(userFunc) userFunc(configEntries, i);
                         configEntries[i]._toggle = !configEntries[i]._toggle;
                     }
                     if(configEntries[i]._toggle  &&  getMiscOptions(EnableMenusTimeout))
@@ -272,7 +274,7 @@ namespace Gui
                 }
                 break;
 
-                // TODO: uses option as an integer value, a bit hacky but will do for now
+                // Uses _option as an integer _value
                 case Spinner:
                 {
                     int min = 1, max = 1, itemCount = 0;
@@ -285,6 +287,7 @@ namespace Gui
 
                     if(GuiSpinner({float(x), float(y) + float(i-startEntry)*30, 180, 25}, "", &configEntries[i]._option, min, max, configEntries[i]._toggle))
                     {
+                        if(userFunc) userFunc(configEntries, i);
                         configEntries[i]._toggle = !configEntries[i]._toggle;
                     }
                     Util::strcpy(configEntries[i]._value, std::to_string(configEntries[i]._option), MAX_CONFIG_TEXT, _F, _L);
@@ -324,10 +327,17 @@ namespace Gui
         end = (end >= NumServerEntries) ? NumServerEntries - 1 : end;
     }
 
+    bool handleStyleEntry(GuiEntry guiEntries[], int index)
+    {
+        if(index != GUI_STYLE_CONTROL) return false;
+
+        return setStyle(getDediConfig(InitialStyle));
+    }
+
     void handleConfigEntries()
     {
         // Textboxes and dropdownboxes
-        handleConfigEntries(_dediConfig,      30,  85,  0,  NumDediEntries - 1);
+        handleConfigEntries(_dediConfig,      30,  85,  1,  NumDediEntries - 1, handleStyleEntry);
         handleConfigEntries(_steamConfig,    240,  85,  0,  NumSteamEntries - 1);
         handleConfigEntries(_steamCmdConfig, 450,  85,  0,  NumSteamCmdEntries - 1);
         handleConfigEntries(_askaConfig,     660,  85,  0,  NumAskaEntries - 1);
@@ -341,7 +351,7 @@ namespace Gui
 
     void handleConfigTooltips()
     {
-        handleTooltips(_dediConfig,      30,  85, 0, NumDediEntries - 1);
+        handleTooltips(_dediConfig,      30,  85, 1, NumDediEntries - 1);
         handleTooltips(_steamConfig,    240,  85, 0, NumSteamEntries - 1);
         handleTooltips(_steamCmdConfig, 450,  85, 0, NumSteamCmdEntries - 1);
         handleTooltips(_askaConfig,     660,  85, 0, NumAskaEntries - 1);

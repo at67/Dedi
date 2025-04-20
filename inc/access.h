@@ -8,7 +8,7 @@ namespace Gui
 {
     enum Page {Server=0, Config, Saves, World, Options, NumPages};
 
-    enum DediEntries {InstallPath=0, StylesFolder, SavesFolder, BackupFolder, InitialStyle, MaxArchiveSaves, MaxUsersSaves, NumDediEntries};
+    enum DediEntries {InstallPath=0, StylesFolder, SavesFolder, BackupFolder, InitialStyle, MaxServerSaves, MaxUserSaves, NumDediEntries};
     enum SteamEntries {HKLMRegSubKey=0, HKLMRegValue, SteamApps, AppManifest, LibraryFolders, HTTPSteamSvr, NumSteamEntries};
     enum SteamCmdEntries {PathSteamCmd=0, DoneSteamCmd, CoupSteamCmd, QuitSteamCmd, AppUSteamCmd, ExecSteamCmd, OpenSteamCmd, HTTPSteamCmd, NumSteamCmdEntries};
     enum AskaEntries {AskaSvrBat=0, AskaSvrProps, AskaSvrPath, AskaExePath, AskaSvrAppId, AskaExeAppId, AskaSavePath, NumAskaEntries};
