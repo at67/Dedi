@@ -45,6 +45,13 @@ namespace Gui
     };
 
 
+    bool setWorldSeed()
+    {
+        if(World::getSeed().size() == 0) return false;
+        setServerConfig(Seed, &World::getSeed()[0]);
+        return true;
+    }
+
     void handleWorldEntries(int x, int y, int startEntry, int endEntry)
     {
         for(auto i=endEntry; i>=startEntry; i--)
@@ -172,17 +179,28 @@ namespace Gui
         if(!getMiscOptions(EnableWorldGen)) GuiSetState(STATE_NORMAL);
     }
 
+    bool initWorldProperties()
+    {
+        std::string worldGen = getWorldGenFile();
+        if(!Util::fileExists(worldGen)) return false;
+
+        World::loadWorldGen(worldGen);
+        if(World::getSeed().size() == 0) return false;
+
+        setServerConfig(Seed, &World::getSeed()[0]);
+
+        return true;
+    }
+
     bool loadWorldProperties()
     {
         std::string worldGen = getWorldGenFile();
-        bool fileExists = Util::fileExists(worldGen);
-        if(!fileExists)
+        if(!Util::fileExists(worldGen))
         {
             log(Util::FatalError, stderr, _f, _F, _L, "Couldn't find World Generation file %s", worldGen.c_str());
             return false;
         }
 
-        //worldGen = "C:/Users/at67.DADMASTERBEAST.000/AppData/LocalLow/Sand Sailor Studio/Aska/data/savegame_234b9_210824040035/worldgen";
         World::loadWorldGen(worldGen);
         World::getWorldGen(_worldSettings);
 

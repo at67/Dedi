@@ -31,6 +31,11 @@ namespace Gui
 
     GuiWindowFileDialogState& getFileDialogState() {return _fileDialogState;}
 
+    int getTextPixels(const std::string& text)
+    {
+        return int(MeasureTextEx(GuiGetFont(), text.c_str(), float(GuiGetFont().baseSize), float(GuiGetStyle(DEFAULT, TEXT_SPACING))).x);
+    }
+
 
     void defaultSection(const std::string& section, GuiEntry guiEntries[], int numEntries)
     {
@@ -434,7 +439,7 @@ namespace Gui
         if(GuiButton({770, 10, 90, 20}, "About")) about = true;
         if(about)
         {
-            if(GuiMessageBox({275, 200, 350, 175}, "#191#About", "Dedi: Aska Dedicated Server Manager \nGithub: https://github.com/at67/Dedi\nAuthor: at67\nVersion: v0.1", "OK") >= 0)
+            if(GuiMessageBox({275, 200, 350, 175}, "#191#About", " Dedi: Aska Dedicated Server Manager \nGithub: https://github.com/at67/Dedi\nVersion: v0.1\nAuthor: at67", "OK") >= 0)
             {
                 about = false;
             }
@@ -493,6 +498,8 @@ namespace Gui
         if(!loadOptions("options.ini")) return false;
 
         initStyles(0);
+
+        initWorldProperties();
 
         _fileDialogState = InitGuiWindowFileDialog(GetWorkingDirectory());
         

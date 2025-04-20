@@ -32,11 +32,6 @@ namespace Status
     static Rectangle _bounds;
 
 
-    int getTextPixels(const std::string& text)
-    {
-        return int(MeasureTextEx(GuiGetFont(), text.c_str(), float(GuiGetFont().baseSize), float(GuiGetStyle(DEFAULT, TEXT_SPACING))).x);
-    }
-
     void reset(Font& font)
     {
         _charIndex = 0;
@@ -45,7 +40,7 @@ namespace Status
 
         for(size_t i=0; i<_status.size(); i++)
         {
-            int pixels = getTextPixels(_status[i]._text);
+            int pixels = Gui::getTextPixels(_status[i]._text);
             if(pixels > _maxPixels)
             {
                 _maxPixels = pixels;
@@ -76,7 +71,7 @@ namespace Status
             _scrollIndex = _maxIndex - _maxLines;
         }
 
-        int pixels = getTextPixels(text);
+        int pixels = Gui::getTextPixels(text);
         _status.push_back({int(_status.size()), text});
         if(pixels > _maxPixels)
         {

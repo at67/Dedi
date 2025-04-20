@@ -8,8 +8,6 @@
 
 namespace Status
 {
-    int getTextPixels(const std::string& text);
-
     void reset(Font& font);
 
     void drawText(const std::string& text, int i, int c, int x, int y, const Color& color, int alignment=TEXT_ALIGN_LEFT);

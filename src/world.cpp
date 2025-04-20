@@ -32,7 +32,24 @@ namespace World
     static uint32_t _settingsLength = 0;
 
     static std::vector<char> _buffer;
+    static std::vector<char> _seed;
 
+
+    const std::vector<char>& getSeed() {return _seed;}
+
+
+    void createSeed()
+    {
+        // Seed
+        uint8_t seedLength = _buffer[0x0E];
+        int seedEnd = 0x0F + seedLength;
+
+        _seed.clear();
+        _seed.resize(seedLength + 1);
+
+        strncpy(&_seed[0], &_buffer[0x0F], seedLength);
+        _seed[seedLength] = 0;
+    }
 
     bool loadWorldGen(const std::string& worldGen)
     {
@@ -51,6 +68,9 @@ namespace World
         _buffer.resize(length);
         infile.read(&_buffer[0], length);
         infile.close();
+
+        // Seed
+        createSeed();
 
         log(Util::Success, stderr, _f, _F, _L, "Loaded World Generation file %s", worldGen.c_str());
 
@@ -74,16 +94,6 @@ namespace World
         return true;
     }
 
-    void getSeed(std::vector<char>& seed)
-    {
-        // Seed
-        uint8_t seedLength = _buffer[0x0E];
-        int seedEnd = 0x0F + seedLength;
-        seed.resize(seedLength + 1);
-        strncpy(&seed[0], &_buffer[0x0F], seedLength);
-        seed[seedLength] = 0;
-    }
-
     int searchReverse(const std::vector<char>& buffer, const std::vector<char> marker, int offset)
     {
         int start = offset - int(marker.size());
@@ -105,10 +115,6 @@ namespace World
     bool getWorldGen(std::unordered_map<SettingsType, char>& settings)
     {
         settings.clear();
-
-        // Seed
-        std::vector<char> seed;
-        getSeed(seed);
 
         // Find marker 0x00 0x02 0x09 0x00
         uint32_t offset = Util::getUint32(&_buffer[WORLD_OFFSET0_INDEX]);

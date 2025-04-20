@@ -13,6 +13,8 @@ namespace World
                        InvasionDifficulty=0x17, MonsterDensity=0x34, MonsterPopulation=0x3D, WulfarPopulation=0x24, HerbivorePopulation=0x32, BearPopulation=0x57};
 
 
+    const std::vector<char>& getSeed();
+
     bool loadWorldGen(const std::string& worldGen);
     bool saveWorldGen(const std::string& worldGen);
 

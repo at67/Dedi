@@ -12,11 +12,11 @@ namespace Gui
 
     static GuiEntry _miscOptions[NumMiscEntries] =
     {
-        {"EnableToolTips",         "Enable or Disable Tooltips",                 "", "true",  "", CheckBox, false, 0, false, STATE_NORMAL, 0, ""},
-        {"EnableMenusTimeout",     "Enable or Disable Dropdown Box timeout",     "", "true",  "", CheckBox, false, 0, false, STATE_NORMAL, 0, ""},
-        {"EnableStylesTimeout",    "Enable or Disable Styles list timeout",      "", "true",  "", CheckBox, false, 0, false, STATE_NORMAL, 0, ""},
-        {"EnableStatusAutoScroll", "Enable or Disable Status panel auto scroll", "", "false", "", CheckBox, false, 0, false, STATE_NORMAL, 0, ""},
-        {"EnableWorldGen",         "Enable or Disable WorldGen modification",    "", "false", "", CheckBox, false, 0, false, STATE_NORMAL, 0, ""}
+        {"EnableToolTips",         "Enable Tool Tips",         "Enable or Disable Tooltips",                 "", "true",  "", CheckBox, false, 0, false, STATE_NORMAL, 0, ""},
+        {"EnableMenusTimeout",     "Enable Menus Timeout",     "Enable or Disable Dropdown Box timeout",     "", "true",  "", CheckBox, false, 0, false, STATE_NORMAL, 0, ""},
+        {"EnableStylesTimeout",    "Enable Styles Timeout",    "Enable or Disable Styles list timeout",      "", "true",  "", CheckBox, false, 0, false, STATE_NORMAL, 0, ""},
+        {"EnableStatusAutoScroll", "Enable Status Autoscroll", "Enable or Disable Status panel auto scroll", "", "false", "", CheckBox, false, 0, false, STATE_NORMAL, 0, ""},
+        {"EnableWorldGen",         "Enable Worldgen",          "Enable or Disable WorldGen modification",    "", "false", "", CheckBox, false, 0, false, STATE_NORMAL, 0, ""}
     };
 
 
@@ -123,12 +123,12 @@ namespace Gui
 
     void handleOptionsEntries()
     {
-        handleOptionsEntries(_miscOptions, 20, 75, 0, NumMiscEntries - 1);
+        handleOptionsEntries(_miscOptions, 30, 85, 0, NumMiscEntries - 1);
     }
 
     void handleOptionsTooltips()
     {
-        handleTooltips(_miscOptions, 20, 75, 0, NumMiscEntries - 1);
+        handleTooltips(_miscOptions, 30, 85, 0, NumMiscEntries - 1);
     }
 
     void handleOptions()

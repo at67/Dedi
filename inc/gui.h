@@ -59,6 +59,7 @@ namespace Gui
     struct GuiEntry
     {
         const std::string _key;
+        const std::string _name;
         const std::string _toolTip;
         const std::string _options;
         const std::string _default;
@@ -74,6 +75,10 @@ namespace Gui
 
     using GuiEntryFunc = std::function<bool (GuiEntry guiEntries[], int index)>;
 
+
+    int getTextPixels(const std::string& text);
+
+    bool setWorldSeed();
 
     void defaultSection(const std::string& section, GuiEntry configEntries[], int numEntries);
     void createSection(std::ofstream& outfile, const std::string& section, GuiEntry configEntries[], int numEntries, bool useDefaults=false);
@@ -115,4 +120,6 @@ namespace Gui
     void handleFileDialog(const std::string& folder);
 
     bool initialise();
+
+    bool initWorldProperties();
 }
