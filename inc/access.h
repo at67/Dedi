@@ -14,7 +14,7 @@ namespace Gui
     enum AskaEntries {AskaSvrBat=0, AskaSvrProps, AskaSvrPath, AskaExePath, AskaSvrAppId, AskaExeAppId, AskaSavePath, NumAskaEntries};
     enum ServerEntries
     {
-        DediName=0, SaveId, DisplayName, ServerName, Seed, Password, SteamGamePort, SteamQueryPort, AuthenticationToken, Region, KeepServerWorldAlive,
+        ProfileName=0, DisplayName, ServerName, Password, SaveId, Seed, SteamGamePort, SteamQueryPort, AuthenticationToken, Region, KeepServerWorldAlive,
         AutosaveStyle, Mode, TerrainAspect, TerrainHeight, StartingSeason, YearLength, Precipitation, DayLength, StructureDecay, InvasionDificulty,
         MonsterDensity, MonsterPopulation, WulfarPopulation, HerbivorePopulation, BearPopulation, NumServerEntries
     };

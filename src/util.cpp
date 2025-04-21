@@ -122,15 +122,16 @@ namespace Util
         return text;
     }
 
-    std::string& rtrim(std::string& text)
-    {
-        text.erase(text.find_last_not_of(" \n\r\t") + 1);
-        return text;
-    }
-
     std::string& lower(std::string& text)
     {
         std::transform(text.begin(), text.end(), text.begin(), ::tolower);
+        return text;
+    }
+
+    std::string& rtrim(std::string& text, char chr)
+    {
+        auto pos = text.find_last_not_of(chr + "\t\f\v\n\r");
+        text.erase(pos + 1);
         return text;
     }
 

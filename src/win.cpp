@@ -36,18 +36,19 @@ namespace Win
         ::DwmSetWindowAttribute(hWnd, DWMWA_USE_IMMERSIVE_DARK_MODE, &value, sizeof(value));
     }
 
-    bool getLastErrorStr(std::string& errorStr)
+    bool getLastErrorStr(std::string& error)
     {
-        const auto kMaxErrorStringSize = 1024;
-
-        DWORD error = GetLastError();
-        errorStr.resize(kMaxErrorStringSize);
-        std::fill(&errorStr[0], &errorStr[0] + kMaxErrorStringSize - 1, 0);
-        if(FormatMessage(FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS, nullptr, error, LANG_SYSTEM_DEFAULT, &errorStr[0], kMaxErrorStringSize, nullptr) == 0)
+        char* buffer = nullptr;
+        if(FormatMessage(FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS, nullptr, GetLastError(), LANG_SYSTEM_DEFAULT, (LPTSTR)&buffer, 0, nullptr) == 0)
         {
             log(Util::FatalError, stderr, _f, _F, _L, "FormatMessage() : FAILED");
             return false;
         }
+
+        // Remove newlines
+        error = buffer;
+        Util::rtrim(error, 0);
+        LocalFree(buffer);
 
         return true;
     }

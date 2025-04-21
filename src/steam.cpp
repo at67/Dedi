@@ -184,8 +184,7 @@ namespace Steam
                     return;
                 }
 
-                if(Util::pathExists(Gui::getDediConfig(Gui::InstallPath) + "/" + Gui::getSteamCmdConfig(Gui::PathSteamCmd) + "/Config")) _steamCmdInstalled = false;
-
+                _steamCmdInstalled = true;
                 _steamCmdUpdated = false;
                 update();
                 _cmdOp = CmdWaitCoup;

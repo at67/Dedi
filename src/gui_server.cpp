@@ -48,9 +48,7 @@ namespace Gui
 
     bool checkSteamCmd()
     {
-        bool found = Util::fileExists(getDediConfig(InstallPath) + "/" + getSteamCmdConfig(PathSteamCmd) + "/" + getSteamCmdConfig(ExecSteamCmd));
-        //if(!found  &&  Steam::getCmdOp() == Steam::CmdIdle) Steam::setCmdOp(Steam::CmdInit);
-        return found;
+        return Util::fileExists(getDediConfig(InstallPath) + "/" + getSteamCmdConfig(PathSteamCmd) + "/" + getSteamCmdConfig(ExecSteamCmd));
     }
 
     bool checkSteamToken()
@@ -347,8 +345,11 @@ namespace Gui
 
         static std::vector<char> seed(MAX_STR_TEXT + 1);
         Util::strcpy(&seed[0], getServerConfig(Seed), MAX_STR_TEXT, _F, _L);
-        GuiLabel({335, 335, 150, 20}, "Seed ");
-        GuiTextBox({335 + float(getTextPixels("Seed ")), 335, float(getTextPixels(getServerConfig(Seed).c_str()) + 10), 20}, &seed[0], size, false);
+        //float x = 850 - (getTextPixels(getServerConfig(Seed).c_str()) + 10);
+        //GuiLabel({x - float(getTextPixels("Seed ")), 335, 150, 20}, "Seed ");
+        //GuiTextBox({x, 335, float(getTextPixels(getServerConfig(Seed).c_str()) + 10), 20}, &seed[0], size, false);
+        GuiLabel({450 - float(getTextPixels("Seed ")), 335, 150, 20}, "Seed ");
+        GuiTextBox({450, 335, 400, 20}, &seed[0], size, false);
 
 #if !defined(_DEBUG)
         // Clipboard
@@ -390,7 +391,7 @@ namespace Gui
     {
         GuiGroupBox({20, 365, 830, 230}, "Info");
 
-        const std::vector<ServerEntries> serverEntries0 = {DediName, DisplayName, ServerName, Password, SaveId, Region, KeepServerWorldAlive, AutosaveStyle};
+        const std::vector<ServerEntries> serverEntries0 = {ProfileName, DisplayName, ServerName, Password, SaveId, Region, KeepServerWorldAlive, AutosaveStyle};
         float xpos = drawServerEntries(serverEntries0, 30, 382, 20);
 
         const std::vector<ServerEntries> serverEntries1 = {Mode, TerrainAspect, TerrainHeight, StartingSeason, YearLength, Precipitation, DayLength, StructureDecay};

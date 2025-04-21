@@ -66,12 +66,12 @@ namespace Gui
     // Server config
     static GuiEntry _serverConfig[NumServerEntries] =
     {
-        {"DediName",            "Dedi Name",         "Name that identifies this server to Dedi", "",                          "Default",         "",                        TextBox,     false, 0, false, STATE_NORMAL,   0, ""},
-        {"SaveId",              "Save Id",           "<id> from savegame_<id>",                  "",                          "",                "save id",                 TextBox,     false, 0, false, STATE_NORMAL,   0, ""},
+        {"ProfileName",         "Profile Name",      "Profile name that identifies this server", "",                          "Default",         "",                        TextBox,     false, 0, false, STATE_NORMAL,   0, ""},
         {"DisplayName",         "Display Name",      "Display name in session list",             "",                          "Default Session", "display name",            TextBox,     false, 0, false, STATE_NORMAL,   0, ""},
         {"ServerName",          "Server Name",       "Server name in session list",              "",                          "My Aska Server",  "server name",             TextBox,     false, 0, false, STATE_NORMAL,   0, ""},
-        {"Seed",                "Seed",              "Seed of the save",                         "",                          "",                "seed",                    TextBox,     false, 0, false, STATE_NORMAL,   0, ""},
         {"Password",            "Password",          "Session password, makes session private",  "",                          "",                "password",                TextBox,     false, 0, false, STATE_NORMAL,   0, ""},
+        {"SaveId",              "Save Id",           "<id> from savegame_<id>",                  "",                          "",                "save id",                 TextBox,     false, 0, false, STATE_NORMAL,   0, ""},
+        {"Seed",                "Seed",              "Seed of the save",                         "",                          "",                "seed",                    TextBox,     false, 0, false, STATE_NORMAL,   0, ""},
         {"SteamGamePort",       "Steam Game Port",   "Steam gameplay port",                      "",                          "27015",           "steam game port",         TextBox,     false, 0, false, STATE_NORMAL,   0, ""},
         {"SteamQueryPort",      "Steam Query Port",  "Steam queries port",                       "",                          "27016",           "steam query port",        TextBox,     false, 0, false, STATE_NORMAL,   0, ""},
         {"AuthenticationToken", "Steam Token",       "Steam server authentication token",        "",                          "",                "authentication token",    TextBox,     false, 0, false, STATE_NORMAL,   0, ""},
