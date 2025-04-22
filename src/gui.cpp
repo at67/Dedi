@@ -556,6 +556,7 @@ namespace Gui
         Win::initialise();
 
         SetTraceLogLevel(LOG_ERROR);
+        SetConfigFlags(FLAG_WINDOW_ALWAYS_RUN);
         InitWindow(870, 785, "Dedi: Aska Dedicated Server Manager");
         SetTargetFPS(60);
         SetExitKey(KEY_NULL);
