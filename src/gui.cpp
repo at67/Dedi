@@ -564,7 +564,7 @@ namespace Gui
 
         Win::setDarkMode(GetWindowHandle());
 
-        Image icon = LoadImage("juggler.png");
+        Image icon = LoadImage("viking.png");
         SetWindowIcon(icon);
         UnloadImage(icon);
 
