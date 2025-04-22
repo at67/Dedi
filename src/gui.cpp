@@ -207,19 +207,19 @@ namespace Gui
 
         if(_styles) GuiUnlock();
         if(GuiButton({10, 755, 90, 20}, "Styles")) _styles = !_styles;
-        if(_styles)
-        {
-            // Open styles list
-            float listViewHeight = float(_styleCount*18) + 4;
-            GuiSetStyle(LISTVIEW, LIST_ITEMS_HEIGHT, 16);
-            GuiListView({10, 750-listViewHeight, 90, listViewHeight}, _styleList.c_str(), nullptr, &_styleIndex);
+        if(!_styles) return;
 
-            // Close styles list after short amount of time
-            if(getMiscOptions(EnableStylesTimeout)) timeout.update(_styles);
-            _styles ? GuiLock() : GuiUnlock();
+        // Open styles list
+        float listViewHeight = float(_styleCount*18) + 4;
+        GuiSetStyle(LISTVIEW, LIST_ITEMS_HEIGHT, 16);
+        GuiListView({10, 750-listViewHeight, 90, listViewHeight}, _styleList.c_str(), nullptr, &_styleIndex);
 
-            loadStyle();
-        }
+        // Close styles list after short amount of time
+        if(getMiscOptions(EnableStylesTimeout)) timeout.update(_styles);
+
+        if(_styles) GuiLock();
+
+        loadStyle();
     }
 
     void handleStatus()
@@ -464,60 +464,58 @@ namespace Gui
     void handleAbout()
     {
         static bool about = false;
-        if(GuiButton({770, 10, 90, 20}, "About")) about = true;
-        if(about)
+
+        if(about) GuiUnlock();
+        if(GuiButton({770, 10, 90, 20}, "About")) about = !about;
+        if(!about) return;
+
+        const std::string aboutText = std::string("Dedi: Aska Dedicated Server Manager\n") + 
+                                        std::string("Version: v0.1\n"                      ) +
+                                        std::string("Author: at67"                         );
+
+        const std::string libText = std::string("https://github.com/at67/Dedi;"            ) +
+                                    std::string("https://github.com/raysan5/raylib;"       ) + 
+                                    std::string("https://github.com/raysan5/raygui;"       ) +
+                                    std::string("https://github.com/dacap/clip;"           ) +
+                                    std::string("https://github.com/tronkko/dirent;"       ) +
+                                    std::string("https://github.com/benhoyt/inih;"         ) +
+                                    std::string("https://github.com/richgel999/miniz;"     ) +
+                                    std::string("https://github.com/TinyTinni/ValveFileVDF");
+
+        const std::unordered_map<int, std::string> libUrl = 
         {
-            const std::string aboutText = std::string("Dedi: Aska Dedicated Server Manager\n") + 
-                                          std::string("Version: v0.1\n"                      ) +
-                                          std::string("Author: at67"                         );
+            {0, "https://github.com/at67/Dedi",            },
+            {1, "https://github.com/raysan5/raylib",       }, 
+            {2, "https://github.com/raysan5/raygui",       },
+            {3, "https://github.com/dacap/clip",           },
+            {4, "https://github.com/tronkko/dirent",       },
+            {5, "https://github.com/benhoyt/inih",         },
+            {6, "https://github.com/richgel999/miniz",     },
+            {7, "https://github.com/TinyTinni/ValveFileVDF"}
+        };
 
-            const std::string libText = std::string("https://github.com/at67/Dedi;"            ) +
-                                        std::string("https://github.com/raysan5/raylib;"       ) + 
-                                        std::string("https://github.com/raysan5/raygui;"       ) +
-                                        std::string("https://github.com/dacap/clip;"           ) +
-                                        std::string("https://github.com/tronkko/dirent;"       ) +
-                                        std::string("https://github.com/benhoyt/inih;"         ) +
-                                        std::string("https://github.com/richgel999/miniz;"     ) +
-                                        std::string("https://github.com/TinyTinni/ValveFileVDF");
-
-            const std::unordered_map<int, std::string> libUrl = 
-            {
-                {0, "https://github.com/at67/Dedi",            },
-                {1, "https://github.com/raysan5/raylib",       }, 
-                {2, "https://github.com/raysan5/raygui",       },
-                {3, "https://github.com/dacap/clip",           },
-                {4, "https://github.com/tronkko/dirent",       },
-                {5, "https://github.com/benhoyt/inih",         },
-                {6, "https://github.com/richgel999/miniz",     },
-                {7, "https://github.com/TinyTinni/ValveFileVDF"}
-            };
-
-            GuiUnlock();
-
-            // About text
-            int textSpacing = GuiGetStyle(DEFAULT, TEXT_LINE_SPACING);
-            GuiSetStyle(DEFAULT, TEXT_LINE_SPACING, 20);
-            if(GuiMessageBox({275, 200, 425, 300}, "#191#About", aboutText.c_str(), "OK", TEXT_ALIGN_TOP) >= 0)
-            {
-                GuiUnlock();
-                about = false;
-                return;
-            }
-            GuiSetStyle(DEFAULT, TEXT_LINE_SPACING, textSpacing);
-
-            // Libs text
-            int libOption = -1;
-            GuiSetStyle(LISTVIEW, LIST_ITEMS_HEIGHT, 16);
-            int baseColour = GuiGetStyle(DEFAULT, BACKGROUND_COLOR);
-            GuiSetStyle(DEFAULT, BACKGROUND_COLOR, GuiGetStyle(DEFAULT, BASE_COLOR_NORMAL));
-            GuiListView({288, 302, 399, 150}, libText.c_str(), nullptr, &libOption);
-            GuiSetStyle(DEFAULT, BACKGROUND_COLOR, baseColour);
-            GuiLock();
-
-            if(libOption == -1  ||  libUrl.find(libOption) == libUrl.end()) return;
-
-            Win::shellExecute(libUrl.at(libOption));
+        // About text
+        int textSpacing = GuiGetStyle(DEFAULT, TEXT_LINE_SPACING);
+        GuiSetStyle(DEFAULT, TEXT_LINE_SPACING, 20);
+        if(GuiMessageBox({225, 220, 425, 300}, "#191#About", aboutText.c_str(), "OK", TEXT_ALIGN_TOP) >= 0)
+        {
+            about = false;
+            return;
         }
+        GuiSetStyle(DEFAULT, TEXT_LINE_SPACING, textSpacing);
+
+        // Libs text
+        int libOption = -1;
+        GuiSetStyle(LISTVIEW, LIST_ITEMS_HEIGHT, 16);
+        int baseColour = GuiGetStyle(DEFAULT, BACKGROUND_COLOR);
+        GuiSetStyle(DEFAULT, BACKGROUND_COLOR, GuiGetStyle(DEFAULT, BASE_COLOR_NORMAL));
+        GuiListView({238, 322, 399, 150}, libText.c_str(), nullptr, &libOption);
+        GuiSetStyle(DEFAULT, BACKGROUND_COLOR, baseColour);
+        GuiLock();
+
+        if(libOption == -1  ||  libUrl.find(libOption) == libUrl.end()) return;
+
+        Win::shellExecute(libUrl.at(libOption));
     }
 
     void handleButtons()
