@@ -1,4 +1,4 @@
-![Juggler](juggler.png)
+![Viking.png](viking.png)
 # Dedi
 Is a Windows 10/11 only tool that allows for the simple installation, monitoring and control of the Aska Dedicated Server.
 
