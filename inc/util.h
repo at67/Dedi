@@ -77,7 +77,6 @@ namespace Util
 
     std::string& strip(std::string& text);
     std::string& lower(std::string& text);
-    std::string& rtrim(std::string& text);
     std::string& rtrim(std::string& text, char chr=' ');
 
     int stricmp(const char* src1, const char* src2);

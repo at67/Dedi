@@ -124,7 +124,7 @@ namespace Gui
             std::string saveid;
             if(readServerProp(getDediConfig(InstallPath) + "/" + getAskaConfig(AskaSvrProps), "saveid=", saveid))
             {
-                setServerConfig(SaveId, saveid);
+                if(getServerConfig(SaveId).size() == 0) setServerConfig(SaveId, saveid);
             }
         }
 

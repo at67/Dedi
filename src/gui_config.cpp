@@ -363,6 +363,40 @@ namespace Gui
         }
     }
 
+    void handleGetSave()
+    {
+        static bool dlgSaveId = false;
+        static bool getSaveId = false;
+
+        if(GuiButton({190, 755, 90, 20}, "SaveId")) dlgSaveId = !dlgSaveId;
+        if(dlgSaveId  &&  !getFileDialogState().windowActive)
+        {
+            dlgSaveId = false;
+            getSaveId = true;
+            std::string savesPath = getenv("APPDATA") + std::string("/../") + getAskaConfig(AskaSavePath) + "/server";
+            getFileDialogState().windowActive = true;
+            getFileDialogState().saveFileMode = false;
+            getFileDialogState().dirPathEditMode = false;
+            getFileDialogState().dirPathModeOnly = true;
+            Util::strcpy(getFileDialogState().dialogTitle, "Get SaveId", DLG_STR_LEN, _F, _L);
+            Util::strcpy(getFileDialogState().selectText, "Get", DLG_STR_LEN, _F, _L);
+            Util::strcpy(getFileDialogState().dirPathText, savesPath, DLG_STR_LEN, _F, _L);
+        }
+
+        // Dialog load
+        if(getSaveId  &&  getFileDialogState().SelectFilePressed)
+        {
+            const std::string saveGamePrefix = "savegame_";
+            getSaveId = false;
+            auto pos = std::string(getFileDialogState().fileNameText).find(saveGamePrefix);
+            if(pos == std::string::npos) return;
+            std::string saveId = std::string(getFileDialogState().fileNameText).substr(pos + saveGamePrefix.size());
+            setServerConfig(SaveId, saveId);
+
+            getFileDialogState().SelectFilePressed = false;
+        }
+    }
+
     void handleGetToken()
     {
         static bool getToken = false;
@@ -387,6 +421,7 @@ namespace Gui
 
     void handleConfigButtons()
     {
+        handleGetSave();
         handleGetToken();
         handleGenerate();
     }

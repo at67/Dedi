@@ -7,6 +7,7 @@
 #include <status.h>
 
 #include <map>
+#include <unordered_map>
 #include <vector>
 #include <fstream>
 
@@ -316,8 +317,10 @@ namespace Gui
             }
             getFileDialogState().windowActive = true;
             getFileDialogState().saveFileMode = false;
+            getFileDialogState().dirPathModeOnly = false;
             Util::strcpy(getFileDialogState().dialogTitle, title, DLG_STR_LEN, _F, _L);
             Util::strcpy(getFileDialogState().selectText, "Load", DLG_STR_LEN, _F, _L);
+            Util::strcpy(getFileDialogState().dirPathText, GetWorkingDirectory(), DLG_STR_LEN, _F, _L);
         }
 
         // Dialog load
@@ -374,8 +377,10 @@ namespace Gui
             }
             getFileDialogState().windowActive = true;
             getFileDialogState().saveFileMode = true;
+            getFileDialogState().dirPathModeOnly = false;
             Util::strcpy(getFileDialogState().dialogTitle, title, DLG_STR_LEN, _F, _L);
             Util::strcpy(getFileDialogState().selectText, "Save", DLG_STR_LEN, _F, _L);
+            Util::strcpy(getFileDialogState().dirPathText, GetWorkingDirectory(), DLG_STR_LEN, _F, _L);
         }
 
         // Dialog save
@@ -462,10 +467,56 @@ namespace Gui
         if(GuiButton({770, 10, 90, 20}, "About")) about = true;
         if(about)
         {
-            if(GuiMessageBox({275, 200, 350, 175}, "#191#About", " Dedi: Aska Dedicated Server Manager \nGithub: https://github.com/at67/Dedi\nVersion: v0.1\nAuthor: at67", "OK") >= 0)
+            const std::string aboutText = std::string("Dedi: Aska Dedicated Server Manager\n") + 
+                                          std::string("Version: v0.1\n"                      ) +
+                                          std::string("Author: at67"                         );
+
+            const std::string libText = std::string("https://github.com/at67/Dedi;"            ) +
+                                        std::string("https://github.com/raysan5/raylib;"       ) + 
+                                        std::string("https://github.com/raysan5/raygui;"       ) +
+                                        std::string("https://github.com/dacap/clip;"           ) +
+                                        std::string("https://github.com/tronkko/dirent;"       ) +
+                                        std::string("https://github.com/benhoyt/inih;"         ) +
+                                        std::string("https://github.com/richgel999/miniz;"     ) +
+                                        std::string("https://github.com/TinyTinni/ValveFileVDF");
+
+            const std::unordered_map<int, std::string> libUrl = 
             {
+                {0, "https://github.com/at67/Dedi",            },
+                {1, "https://github.com/raysan5/raylib",       }, 
+                {2, "https://github.com/raysan5/raygui",       },
+                {3, "https://github.com/dacap/clip",           },
+                {4, "https://github.com/tronkko/dirent",       },
+                {5, "https://github.com/benhoyt/inih",         },
+                {6, "https://github.com/richgel999/miniz",     },
+                {7, "https://github.com/TinyTinni/ValveFileVDF"}
+            };
+
+            GuiUnlock();
+
+            // About text
+            int textSpacing = GuiGetStyle(DEFAULT, TEXT_LINE_SPACING);
+            GuiSetStyle(DEFAULT, TEXT_LINE_SPACING, 20);
+            if(GuiMessageBox({275, 200, 425, 300}, "#191#About", aboutText.c_str(), "OK", TEXT_ALIGN_TOP) >= 0)
+            {
+                GuiUnlock();
                 about = false;
+                return;
             }
+            GuiSetStyle(DEFAULT, TEXT_LINE_SPACING, textSpacing);
+
+            // Libs text
+            int libOption = -1;
+            GuiSetStyle(LISTVIEW, LIST_ITEMS_HEIGHT, 16);
+            int baseColour = GuiGetStyle(DEFAULT, BACKGROUND_COLOR);
+            GuiSetStyle(DEFAULT, BACKGROUND_COLOR, GuiGetStyle(DEFAULT, BASE_COLOR_NORMAL));
+            GuiListView({288, 302, 399, 150}, libText.c_str(), nullptr, &libOption);
+            GuiSetStyle(DEFAULT, BACKGROUND_COLOR, baseColour);
+            GuiLock();
+
+            if(libOption == -1  ||  libUrl.find(libOption) == libUrl.end()) return;
+
+            Win::shellExecute(libUrl.at(libOption));
         }
     }
 
@@ -498,9 +549,7 @@ namespace Gui
 
     void handleFileDialog(const std::string& folder)
     {
-        std::string path = folder;
-        if(path == "") path = GetWorkingDirectory();
-        Util::strcpy(getFileDialogState().dirPathText, path, DLG_STR_LEN, _F, _L);
+        if(folder.size()) Util::strcpy(getFileDialogState().dirPathText, folder, DLG_STR_LEN, _F, _L);
         GuiWindowFileDialog(&_fileDialogState);
     }
 

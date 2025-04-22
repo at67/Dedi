@@ -56,6 +56,7 @@ typedef struct {
 
     // UI variables
     bool dirPathEditMode;
+    bool dirPathModeOnly;
     char dirPathText[DLG_STR_LEN];
 
     int filesListScrollIndex;
@@ -186,6 +187,7 @@ GuiWindowFileDialogState InitGuiWindowFileDialog(const char *initPath)
 
     // Init path data
     state.dirPathEditMode = false;
+    state.dirPathModeOnly = false;
     state.filesListActive = -1;
     state.prevFilesListActive = state.filesListActive;
     state.filesListScrollIndex = 0;
@@ -282,36 +284,42 @@ void GuiWindowFileDialog(GuiWindowFileDialogState *state)
         state->windowActive = !GuiWindowBox(state->windowBounds, title);
 
         // Draw previous directory button + logic
-        if (GuiButton({state->windowBounds.x + state->windowBounds.width - 48, state->windowBounds.y + 24 + 12, 40, 24}, "< .."))
+        if(!state->dirPathModeOnly)
         {
-            // Move dir path one level up
-            strcpy(state->dirPathText, GetPrevDirectoryPath(state->dirPathText));
+            if (GuiButton({state->windowBounds.x + state->windowBounds.width - 48, state->windowBounds.y + 24 + 12, 40, 24}, "< .."))
+            {
+                // Move dir path one level up
+                strcpy(state->dirPathText, GetPrevDirectoryPath(state->dirPathText));
 
-            // Reload directory files (frees previous list)
-            ReloadDirectoryFiles(state);
+                // Reload directory files (frees previous list)
+                ReloadDirectoryFiles(state);
 
-            state->filesListActive = -1;
-            memset(state->fileNameText, 0, DLG_STR_LEN);
-            memset(state->fileNameTextCopy, 0, DLG_STR_LEN);
+                state->filesListActive = -1;
+                memset(state->fileNameText, 0, DLG_STR_LEN);
+                memset(state->fileNameTextCopy, 0, DLG_STR_LEN);
+            }
         }
 
         // Draw current directory text box info + path editing logic
         if (GuiTextBox({state->windowBounds.x + 8, state->windowBounds.y + 24 + 12, state->windowBounds.width - 48 - 16, 24}, state->dirPathText, DLG_STR_LEN, state->dirPathEditMode))
         {
-            if (state->dirPathEditMode)
+            if (!state->dirPathModeOnly)
             {
-                // Verify if a valid path has been introduced
-                if (DirectoryExists(state->dirPathText))
+                if (state->dirPathEditMode)
                 {
-                    // Reload directory files (frees previous list)
-                    ReloadDirectoryFiles(state);
+                    // Verify if a valid path has been introduced
+                    if (DirectoryExists(state->dirPathText))
+                    {
+                        // Reload directory files (frees previous list)
+                        ReloadDirectoryFiles(state);
 
-                    strcpy(state->dirPathTextCopy, state->dirPathText);
+                        strcpy(state->dirPathTextCopy, state->dirPathText);
+                    }
+                    else strcpy(state->dirPathText, state->dirPathTextCopy);
                 }
-                else strcpy(state->dirPathText, state->dirPathTextCopy);
-            }
 
-            state->dirPathEditMode = !state->dirPathEditMode;
+                state->dirPathEditMode = !state->dirPathEditMode;
+            }
         }
 
         // List view elements are aligned left
@@ -336,19 +344,22 @@ void GuiWindowFileDialog(GuiWindowFileDialogState *state)
 
             if (DirectoryExists(TextFormat("%s/%s", state->dirPathText, state->fileNameText)))
             {
-                if (TextIsEqual(state->fileNameText, "..")) strcpy(state->dirPathText, GetPrevDirectoryPath(state->dirPathText));
-                else strcpy(state->dirPathText, TextFormat("%s/%s", (strcmp(state->dirPathText, "/") == 0)? "" : state->dirPathText, state->fileNameText));
+                if(!state->dirPathModeOnly)
+                {
+                    if (TextIsEqual(state->fileNameText, "..")) strcpy(state->dirPathText, GetPrevDirectoryPath(state->dirPathText));
+                    else strcpy(state->dirPathText, TextFormat("%s/%s", (strcmp(state->dirPathText, "/") == 0)? "" : state->dirPathText, state->fileNameText));
 
-                strcpy(state->dirPathTextCopy, state->dirPathText);
+                    strcpy(state->dirPathTextCopy, state->dirPathText);
 
-                // Reload directory files (frees previous list)
-                ReloadDirectoryFiles(state);
+                    // Reload directory files (frees previous list)
+                    ReloadDirectoryFiles(state);
 
-                strcpy(state->dirPathTextCopy, state->dirPathText);
+                    strcpy(state->dirPathTextCopy, state->dirPathText);
 
-                state->filesListActive = -1;
-                strcpy(state->fileNameText, "\0");
-                strcpy(state->fileNameTextCopy, state->fileNameText);
+                    state->filesListActive = -1;
+                    strcpy(state->fileNameText, "\0");
+                    strcpy(state->fileNameTextCopy, state->fileNameText);
+                }
             }
 
             state->prevFilesListActive = state->filesListActive;
@@ -356,7 +367,9 @@ void GuiWindowFileDialog(GuiWindowFileDialogState *state)
 
         // Draw bottom controls
         //--------------------------------------------------------------------------------------
-        GuiLabel({state->windowBounds.x + 8, state->windowBounds.y + state->windowBounds.height - 68, 60, 24}, "File name:");
+        char text[16];
+        (!state->dirPathModeOnly) ? strcpy(text, "File:") : strcpy(text, "Saveid:");
+        GuiLabel({state->windowBounds.x + 8, state->windowBounds.y + state->windowBounds.height - 68, 64, 24}, text);
         if (GuiTextBox({state->windowBounds.x + 72, state->windowBounds.y + state->windowBounds.height - 68, state->windowBounds.width - 184, 24}, state->fileNameText, 128, state->fileNameEditMode))
         {
             if (*state->fileNameText)
@@ -384,8 +397,11 @@ void GuiWindowFileDialog(GuiWindowFileDialogState *state)
             state->fileNameEditMode = !state->fileNameEditMode;
         }
 
-        GuiLabel({state->windowBounds.x + 8, state->windowBounds.y + state->windowBounds.height - 24 - 12, 68, 24}, "File filter:");
-        GuiComboBox({state->windowBounds.x + 72, state->windowBounds.y + state->windowBounds.height - 24 - 12, state->windowBounds.width - 184, 24}, "All files", &state->fileTypeActive);
+        if(!state->dirPathModeOnly)
+        {
+            GuiLabel({state->windowBounds.x + 8, state->windowBounds.y + state->windowBounds.height - 24 - 12, 68, 24}, "Filter:");
+            GuiComboBox({state->windowBounds.x + 72, state->windowBounds.y + state->windowBounds.height - 24 - 12, state->windowBounds.width - 184, 24}, "All files", &state->fileTypeActive);
+        }
 
         state->SelectFilePressed = GuiButton({state->windowBounds.x + state->windowBounds.width - 96 - 8, state->windowBounds.y + state->windowBounds.height - 68, 96, 24}, state->selectText);
 
