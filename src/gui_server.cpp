@@ -5,6 +5,7 @@
 #include <status.h>
 
 #include <set>
+#include <chrono>
 #include <fstream>
 
 
@@ -25,9 +26,10 @@ namespace Gui
     static bool _steamCmdUpdated   = false;
     static bool _serverStarted     = false;
 
-    static uint64_t _ticks      = 0;
-    static uint64_t _upTime     = 0;
-    static uint64_t _activeTime = 0;
+    static uint64_t _ticks = 0;
+
+    static auto _upTimeStart     = std::chrono::system_clock::now();
+    static auto _activeTimeStart = std::chrono::system_clock::now();
 
     static int _serverCrashes = 0;
 
@@ -296,18 +298,26 @@ namespace Gui
 
     void drawUpTime()
     {
-        static uint64_t upTime = _upTime;
         static char time[MAX_STR_TEXT] = "000h 00m 00s";
 
         GuiLabel({450, 230, 150, 20}, "Up Time");
 
-        // Tick up time once a second
-        if(_steamConnected  &&  (_ticks % 60 == 0)) _upTime++;
-
-        if(upTime != _upTime)
+        // Roughly update twice per second
+        if(_ticks % 30 == 0)
         {
-            upTime = _upTime;
-            sprintf(time, "%03lldh %02lldm %02llds", _upTime / (60*60), _upTime / 60 % 60, _upTime % 60);
+            if(_steamConnected)
+            {
+                auto upTime = std::chrono::system_clock::now() - _upTimeStart;
+
+                int64_t hours = std::chrono::duration_cast<std::chrono::hours>(upTime).count();
+                int64_t mins  = std::chrono::duration_cast<std::chrono::minutes>(upTime).count() - hours*60;
+                int64_t secs  = std::chrono::duration_cast<std::chrono::seconds>(upTime).count() - hours*3600 - mins*60;
+                sprintf(time, "%03lldh %02lldm %02llds", hours, mins, secs);
+            }
+            else
+            {
+                strcpy(time, "000h 00m 00s");
+            }
         }
 
         GuiStatusBar({450 + float(getTextPixels("Crash Restarts ")), 230, 130, 20}, time);
@@ -315,18 +325,26 @@ namespace Gui
 
     void drawActiveTime()
     {
-        static uint64_t activeTime = _activeTime;
         static char time[MAX_STR_TEXT] = "000h 00m 00s";
 
         GuiLabel({450, 260, 150, 20}, "Active Time");
 
-        // Tick active time once a second
-        if(_worldActive  &&  (_ticks % 60 == 0)) _activeTime++;
-
-        if(activeTime != _activeTime)
+        // Roughly update twice per second
+        if(_ticks % 30 == 0)
         {
-            activeTime = _activeTime;
-            sprintf(time, "%03lldh %02lldm %02llds", _activeTime / (60*60), _activeTime / 60 % 60, _activeTime % 60);
+            if(_worldActive)
+            {
+                auto activeTime = std::chrono::system_clock::now() - _activeTimeStart;
+
+                int64_t hours = std::chrono::duration_cast<std::chrono::hours>(activeTime).count();
+                int64_t mins  = std::chrono::duration_cast<std::chrono::minutes>(activeTime).count() - hours*60;
+                int64_t secs  = std::chrono::duration_cast<std::chrono::seconds>(activeTime).count() - hours*3600 - mins*60;
+                sprintf(time, "%03lldh %02lldm %02llds", hours, mins, secs);
+            }
+            else
+            {
+                strcpy(time, "000h 00m 00s");
+            }
         }
 
         GuiStatusBar({450 + float(getTextPixels("Crash Restarts ")), 260, 130, 20}, time);
@@ -490,6 +508,9 @@ namespace Gui
 
     void handleServer(bool render)
     {
+        static bool steamConnected = _steamConnected;
+        static bool worldActive    = _worldActive;
+
         //if(_ticks % 120 == 0)
         //{
         //    if(backupSave("user"))   delOldestSave("user",   std::stoi(getDediConfig(MaxUserSaves), nullptr, 10));
@@ -544,16 +565,14 @@ namespace Gui
             startServer();
         }
 
-        if(!_steamConnected)
-        {
-            _upTime = 0;
-        }
+        if(_steamConnected  &&  !steamConnected) _upTimeStart = std::chrono::system_clock::now();
 
-        if(!_worldActive)
-        {
-            _activeTime = 0;
-            _playerList.clear();
-        }
+        if(_worldActive  &&  !worldActive) _activeTimeStart = std::chrono::system_clock::now();
+
+        if(!_worldActive) _playerList.clear();
+
+        steamConnected = _steamConnected;
+        worldActive = _worldActive;
 
         if(!render) return;
 
