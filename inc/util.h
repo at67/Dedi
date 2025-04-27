@@ -68,7 +68,7 @@ namespace Util
 
     void sleep_ms(uint64_t ms);
 
-    std::string getDateTime();
+    std::string getDateTime(bool deliniate=true);
 
     void logStatus(const std::string& text);
 

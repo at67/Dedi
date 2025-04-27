@@ -84,14 +84,14 @@ namespace Util
         std::this_thread::sleep_for(std::chrono::milliseconds(ms));
     }
 
-    std::string getDateTime()
+    std::string getDateTime(bool deliniate)
     {
         auto now = std::chrono::system_clock::now();
         auto now_time_t = std::chrono::system_clock::to_time_t(now);
         auto local_time = std::localtime(&now_time_t);
 
         std::stringstream timeStamp;
-        timeStamp << std::put_time(local_time, "%Y-%b-%d_%H-%M-%S");
+        timeStamp << ((deliniate) ? std::put_time(local_time, "%Y-%b-%d_%H-%M-%S") : std::put_time(local_time, "%Y %b %d : %H %M %S"));
         return timeStamp.str();
     }
 

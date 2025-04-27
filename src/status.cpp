@@ -49,13 +49,15 @@ namespace Status
         }
     }
 
-    void drawText(const std::string& text, int i, int c, int x, int y, const Color& color, int alignment)
+    void drawText(int i, int c, int x, int y, const Color& color, int alignment=TEXT_ALIGN_LEFT)
     {
+        const float timeOffset = 40;
+
         static char num[16];
         sprintf(num, "%d", _status[i]._id);
-        int index = (c > text.size()) ? int(text.size()) : c;
-        GuiDrawText(num, {float(x), float(y), _bounds.width - 30, float(GuiGetFont().baseSize)}, alignment, color);
-        GuiDrawText(text.c_str() + index, {float(x + 35), float(y), _bounds.width - 75, float(GuiGetFont().baseSize)}, alignment, color);
+        int index = (c > _status[i]._text.size()) ? int(_status[i]._text.size()) : c;
+        GuiDrawText(num, {float(x), float(y), timeOffset, float(GuiGetFont().baseSize)}, alignment, color);
+        GuiDrawText(_status[i]._text.c_str() + index, {float(x + timeOffset + 5), float(y), _bounds.width - (45 + timeOffset), float(GuiGetFont().baseSize)}, alignment, color);
     }
 
     void addText(const std::string& text)
@@ -72,7 +74,7 @@ namespace Status
         }
 
         int pixels = Gui::getTextPixels(text);
-        _status.push_back({int(_status.size()), text});
+        _status.push_back({int(_status.size()), Util::getDateTime(false) + " : " + text});
         if(pixels > _maxPixels)
         {
             _maxPixels = pixels;
@@ -129,7 +131,7 @@ namespace Status
         for(int i=_startIndex; i<_endIndex; i++)
         {
             int y = (i - _startIndex) * GuiGetStyle(DEFAULT, TEXT_SIZE);
-            drawText(_status[i]._text, i, _charIndex, int(_bounds.x + 10), int(_bounds.y + y + 10), GetColor(GuiGetStyle(LABEL, TEXT_COLOR_DISABLED)));
+            drawText(i, _charIndex, int(_bounds.x + 10), int(_bounds.y + y + 10), GetColor(GuiGetStyle(LABEL, TEXT_COLOR_DISABLED)));
         }
     }
 }

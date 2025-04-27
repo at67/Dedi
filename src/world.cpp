@@ -72,7 +72,7 @@ namespace World
         // Seed
         createSeed();
 
-        log(Util::Success, stderr, _f, _F, _L, "Loaded World Generation file %s", worldGen.c_str());
+        log(Util::Success, stderr, _f, _F, _L, "Successfully loaded World Generation file %s", worldGen.c_str());
 
         return true;
     }

@@ -65,12 +65,10 @@ namespace Win
         info.lpVerb = "open";
         info.lpFile = url.c_str();
         info.nShow  = SW_SHOWDEFAULT;
-        bool result = ShellExecuteEx(&info);
-        if(!result) 
+        if(!ShellExecuteEx(&info)) 
         {
             std::string errorStr;
-            if(!getLastErrorStr(errorStr)) return false;
-            log(Util::FatalError, stderr, _f, _F, _L, "%s", errorStr.c_str());
+            if(getLastErrorStr(errorStr)) log(Util::FatalError, stderr, _f, _F, _L, "%s", errorStr.c_str());
             return false;
         }
 
@@ -308,17 +306,7 @@ namespace Win
 
     bool endProcess()
     {
-        bool result = TerminateProcess(_processInfo.hProcess, 0);
-        if(!result)
-        {
-            std::string error;
-            if(getLastErrorStr(error)) log(Util::WarnError, stderr, _f, _F, _L, "%s", error.c_str());
-            return false;
-        }
-
-        const DWORD wait = WaitForSingleObject(_processInfo.hProcess, 500);
-        result = (wait == WAIT_OBJECT_0);
-        if(!result)
+        if(!TerminateProcess(_processInfo.hProcess, 0))
         {
             std::string error;
             if(getLastErrorStr(error)) log(Util::WarnError, stderr, _f, _F, _L, "%s", error.c_str());

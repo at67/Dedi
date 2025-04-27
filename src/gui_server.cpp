@@ -296,33 +296,39 @@ namespace Gui
 
     void drawUpTime()
     {
+        static uint64_t upTime = _upTime;
         static char time[MAX_STR_TEXT] = "000h 00m 00s";
 
         GuiLabel({450, 230, 150, 20}, "Up Time");
-        if(_steamConnected)
+
+        // Tick up time once a second
+        if(_steamConnected  &&  (_ticks % 60 == 0)) _upTime++;
+
+        if(upTime != _upTime)
         {
-            if(_ticks % 60 == 0)
-            {
-                sprintf(time, "%03lldh %02lldm %02llds", _upTime / (60*60), _upTime / 60 % 60, _upTime % 60);
-                _upTime++;
-            }
+            upTime = _upTime;
+            sprintf(time, "%03lldh %02lldm %02llds", _upTime / (60*60), _upTime / 60 % 60, _upTime % 60);
         }
+
         GuiStatusBar({450 + float(getTextPixels("Crash Restarts ")), 230, 130, 20}, time);
     }
 
     void drawActiveTime()
     {
+        static uint64_t activeTime = _activeTime;
         static char time[MAX_STR_TEXT] = "000h 00m 00s";
 
         GuiLabel({450, 260, 150, 20}, "Active Time");
-        if(_worldActive)
+
+        // Tick active time once a second
+        if(_worldActive  &&  (_ticks % 60 == 0)) _activeTime++;
+
+        if(activeTime != _activeTime)
         {
-            if(_ticks % 60 == 0)
-            {
-                sprintf(time, "%03lldh %02lldm %02llds", _activeTime / (60*60), _activeTime / 60 % 60, _activeTime % 60);
-                _activeTime++;
-            }
+            activeTime = _activeTime;
+            sprintf(time, "%03lldh %02lldm %02llds", _activeTime / (60*60), _activeTime / 60 % 60, _activeTime % 60);
         }
+
         GuiStatusBar({450 + float(getTextPixels("Crash Restarts ")), 260, 130, 20}, time);
     }
 
