@@ -51,9 +51,9 @@ namespace Status
 
     void drawText(int i, int c, int x, int y, const Color& color, int alignment=TEXT_ALIGN_LEFT)
     {
-        const float timeOffset = 40;
-
         static char num[16];
+        float timeOffset = Gui::getTextPixels("00000");
+
         sprintf(num, "%d", _status[i]._id);
         int index = (c > _status[i]._text.size()) ? int(_status[i]._text.size()) : c;
         GuiDrawText(num, {float(x), float(y), timeOffset, float(GuiGetFont().baseSize)}, alignment, color);

@@ -15,9 +15,29 @@ Is a Windows 10/11 only tool that allows for the simple installation, monitoring
 - Creates a backup of your server's save file for every player that logs in to the server, (this allows a simple rollback mechanism for miscreant players).<br/>
 
 ## Install
+- Download the latest release at: https://github.com/at67/Dedi/releases<br/>
+- The zip file should contain one folder and two files:
+	- styles, (folder)
+	- Dedi.exe, (file)
+	- viking.png, (file)
+- Create a folder with at least 5 GBytes of free space, (more if you plan on using multiple servers or a large number of backup saves).
+- Copy the contents of Dedi.zip into this newly created folder, eg: C:\Dedi<br/>
+	C:\Dedi\styles<br/>
+	C:\Dedi\Dedi.exe<br/>
+	C:\Dedi\viking.png<br/>
 
+## User Guide
 
+TODO:
 <br/>
 <br/>
+
+## Advanced
+
+TODO:
+<br/>
+<br/>
+
+### Screenshot
 
 ![Dedi](dedi.png)
