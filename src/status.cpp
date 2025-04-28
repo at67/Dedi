@@ -52,11 +52,11 @@ namespace Status
     void drawText(int i, int c, int x, int y, const Color& color, int alignment=TEXT_ALIGN_LEFT)
     {
         static char num[16];
-        float timeOffset = Gui::getTextPixels("00000");
+        int timeOffset = Gui::getTextPixels("00000");
 
         sprintf(num, "%d", _status[i]._id);
         int index = (c > _status[i]._text.size()) ? int(_status[i]._text.size()) : c;
-        GuiDrawText(num, {float(x), float(y), timeOffset, float(GuiGetFont().baseSize)}, alignment, color);
+        GuiDrawText(num, {float(x), float(y), float(timeOffset), float(GuiGetFont().baseSize)}, alignment, color);
         GuiDrawText(_status[i]._text.c_str() + index, {float(x + timeOffset + 5), float(y), _bounds.width - (45 + timeOffset), float(GuiGetFont().baseSize)}, alignment, color);
     }
 
@@ -110,13 +110,23 @@ namespace Status
         _bounds = bounds;
         _maxLines = int((_bounds.height - 25) / GuiGetStyle(DEFAULT, TEXT_SIZE));
 
-        // Vertical scroll bar
         GuiSetStyle(SCROLLBAR, ARROWS_VISIBLE, 1);
+
+        // Vertical scroll bar
+        GuiSetStyle(SCROLLBAR, SCROLL_SPEED, std::min(_scrollIndex, 5));
         Rectangle scrollV = {bounds.x + bounds.width - 16, bounds.y + 1, 15, bounds.height - 14};
-        if(_maxIndex > _maxLines) _startIndex = GuiScrollBar(scrollV, _startIndex, 0, _scrollIndex);
-        else GuiScrollBar(scrollV, _startIndex, 0, _scrollIndex);
+        if(_maxIndex > _maxLines)
+        {
+            _startIndex = GuiScrollBar(scrollV, _startIndex, 0, _scrollIndex);
+        }
+        // No vertical scrolling
+        else
+        {
+            GuiScrollBar(scrollV, _startIndex, 0, _scrollIndex);
+        }
 
         // Horizontal scroll bar
+        GuiSetStyle(SCROLLBAR, SCROLL_SPEED, 12);
         Rectangle scrollH = {bounds.x + 1, bounds.y + bounds.height - 16, bounds.width - 14, 15};
         int endCharIndex = int(_status[_savedIndex]._text.size()) - 80;
         _charIndex = GuiScrollBar(scrollH, _charIndex, 0, endCharIndex);
