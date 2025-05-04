@@ -304,6 +304,20 @@ namespace Win
         return true;
     }
 
+    bool waitProcess(int ms)
+    {
+        if(ms == 0) ms = INFINITE;
+        DWORD result = WaitForSingleObject(_processInfo.hProcess, DWORD(ms));
+        if(result != WAIT_OBJECT_0  &&  result != WAIT_TIMEOUT)
+        {
+            std::string error;
+            if(getLastErrorStr(error)) log(Util::WarnError, stderr, _f, _F, _L, "%s", error.c_str());
+            return false;
+        }
+
+        return (result == WAIT_OBJECT_0);
+    }
+
     bool endProcess()
     {
         if(!TerminateProcess(_processInfo.hProcess, 0))

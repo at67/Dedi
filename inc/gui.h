@@ -128,4 +128,6 @@ namespace Gui
     bool initialise();
 
     bool initWorldProperties();
+
+    void shutdownServer();
 }

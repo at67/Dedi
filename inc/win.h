@@ -31,6 +31,7 @@ namespace Win
     bool getFolderNames(const std::string& path, const std::string& search, std::set<std::string>& folders);
 
     bool createProcess(const std::string& name, const std::string& command);
+    bool waitProcess(int ms=0);
     bool endProcess();
 
     bool readConsoleText(std::vector<std::string>& text);

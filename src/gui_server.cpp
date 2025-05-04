@@ -7,6 +7,8 @@
 #include <set>
 #include <chrono>
 #include <fstream>
+#include <thread>
+#include <atomic>
 
 
 namespace Gui
@@ -24,7 +26,13 @@ namespace Gui
 
     static bool _steamCmdInstalled = false;
     static bool _steamCmdUpdated   = false;
-    static bool _serverStarted     = false;
+
+    static std::atomic<bool> _guiStarted    = true;
+    static std::atomic<bool> _serverStarted = false;
+    static std::atomic<bool> _serverExited  = false;
+
+    void checkServerWorker();
+    static std::thread _checkServerThread(checkServerWorker);
 
     static uint64_t _ticks = 0;
 
@@ -171,8 +179,12 @@ namespace Gui
 
     bool checkServerCrashed()
     {
+#if 0
         std::string line;
         return (Win::matchConsoleText("A crash has been intercepted by the crash handler.", line, true) != std::string::npos);
+#else
+        return _serverExited;
+#endif
     }
 
     std::string getSaveFile()
@@ -429,6 +441,22 @@ namespace Gui
     {
     }
 
+    void checkServerWorker()
+    {
+        while(_guiStarted)
+        {
+            if(_serverStarted  &&  Win::waitProcess(100))
+            {
+                // Check _serverStarted again as it's updated in the main thread
+                if(_serverStarted) _serverExited = true;
+            }
+
+            //printf("%d %d\n", _serverStarted.load(), _guiStarted.load());
+
+            Util::sleep_ms(100);
+        }
+    }
+
     void startServer()
     {
         if(!_serverStarted)
@@ -443,7 +471,7 @@ namespace Gui
         }
     }
 
-    void closeServer()
+    void stopServer()
     {
         if(_serverStarted)
         {
@@ -457,6 +485,14 @@ namespace Gui
                 Util::logStatus("Successfully stopped the Server");
             }
         }
+    }
+
+    void shutdownServer()
+    {
+        _guiStarted = false;
+        _serverStarted = false;
+        _checkServerThread.join();
+        Win::endProcess();
     }
 
     void handleServerButtons()
@@ -492,7 +528,7 @@ namespace Gui
                 start = false;
                 if(_serverStarted)
                 {
-                    closeServer();
+                    stopServer();
                 }
                 else
                 {
@@ -556,10 +592,11 @@ namespace Gui
         {
             Util::logStatus("Server crashed, restarting server");
 
+            _serverExited   = false;
             _steamConnected = false;
-            _chatConnected = false;
-            _worldActive = false;
-            _serverStarted = false;
+            _chatConnected  = false;
+            _worldActive    = false;
+            _serverStarted  = false;
             _serverCrashes++;
             _ticks = 0;
             startServer();

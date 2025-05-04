@@ -470,7 +470,7 @@ namespace Gui
         if(!about) return;
 
         const std::string aboutText = std::string("Dedi: Aska Dedicated Server Manager\n") + 
-                                      std::string("Version: v0.12\n"                     ) +
+                                      std::string("Version: v0.13\n"                     ) +
                                       std::string("Author: at67"                         );
 
         const std::string libText = std::string("https://github.com/at67/Dedi;"            ) +

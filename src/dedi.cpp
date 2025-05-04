@@ -21,6 +21,8 @@ int main(int argc, char* argv[])
         EndDrawing();
     }
 
+    Gui::shutdownServer();
+
     CloseWindow();
 
     return 0;

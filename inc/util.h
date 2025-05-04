@@ -33,7 +33,7 @@ namespace Util
             default: fprintf(file, "%s", whtANSI.c_str()); break;
         }
 
-        if(error == FatalError)
+        if(error == WarnError  ||  error == FatalError)
         {
             fprintf(file, "%s() : ", FUNC);
             fprintf(file, "%s : %d : ", FILE, LINE);
