@@ -55,7 +55,7 @@ namespace Status
         int timeOffset = Gui::getTextPixels("00000");
 
         sprintf(num, "%d", _status[i]._id);
-        int index = (c > _status[i]._text.size()) ? int(_status[i]._text.size()) : c;
+        int index = (c > int(_status[i]._text.size())) ? int(_status[i]._text.size()) : c;
         GuiDrawText(num, {float(x), float(y), float(timeOffset), float(GuiGetFont().baseSize)}, alignment, color);
         GuiDrawText(_status[i]._text.c_str() + index, {float(x + timeOffset + 5), float(y), _bounds.width - (45 + timeOffset), float(GuiGetFont().baseSize)}, alignment, color);
     }

@@ -65,7 +65,7 @@ namespace World
         auto length = infile.tellg();
         infile.seekg(0, std::ios_base::beg);
         _buffer.clear();
-        _buffer.resize(length);
+        _buffer.resize(size_t(length));
         infile.read(&_buffer[0], length);
         infile.close();
 
@@ -102,7 +102,7 @@ namespace World
         int pos = -1;
         for(int i=start; i>=0; i--)
         {
-            for(int j=0; j<marker.size(); j++)
+            for(int j=0; j<int(marker.size()); j++)
             {
                 if(buffer[i + j] != marker[j]) break;
                 if(j == marker.size() - 1) pos = i; 

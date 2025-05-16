@@ -23,6 +23,7 @@ namespace Util
 
     template <typename ... Args> void log(LogType error, FILE* file, const char* FUNC, const char* FILE, int LINE, const char* format, Args ... args)
     {
+#if 0
         switch(error)
         {
             case NoError:    fprintf(file, "%s", whtANSI.c_str()); break;
@@ -41,6 +42,7 @@ namespace Util
         fprintf(file, format, args ...);
         fprintf(file, "%s\n", whtANSI.c_str());
         fflush(file);
+#endif
 
         char status[MAX_STR_TEXT] = "";
         sprintf(status, format, args ...);

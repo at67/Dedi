@@ -368,7 +368,7 @@ public:
     bool GetBoolean(const std::string& section, const std::string& key, bool default);
 
 private:
-    int _error;
+    int _error = 0;
 
     // Section, Key, Value with case insensitive compare
     struct comparator

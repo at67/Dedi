@@ -138,7 +138,7 @@ namespace Gui
     {
         // Load selected style
         GuiLoadStyleDefault();
-        if(_styleIndex >= 0  &&  _styleIndex < _styleNames.size())
+        if(_styleIndex >= 0  &&  _styleIndex < int(_styleNames.size()))
         {
             GuiLoadStyle((_stylesFolder + "/" + _styleNames[_styleIndex] + ".rgs").c_str());
         }
@@ -147,7 +147,7 @@ namespace Gui
 
     bool setStyle(int style)
     {
-        if(_styleIndex < 0  ||  _styleIndex >= _styleNames.size()) return false;
+        if(_styleIndex < 0  ||  _styleIndex >= int(_styleNames.size())) return false;
 
         loadStyle();
 
@@ -234,7 +234,7 @@ namespace Gui
             for(size_t i=0; i<text.size(); i++)
             {
                 Util::rtrim(text[i]);
-                if(text[i].size() == 0) text[i].push_back('\n');
+                if(text[i].size() == 0) text[i].push_back(' ');
                 Util::logStatus(text[i]);
             }
         }
@@ -470,7 +470,7 @@ namespace Gui
         if(!about) return;
 
         const std::string aboutText = std::string("Dedi: Aska Dedicated Server Manager\n") + 
-                                      std::string("Version: v0.13\n"                     ) +
+                                      std::string("Version: v0.20\n"                     ) +
                                       std::string("Author: at67"                         );
 
         const std::string libText = std::string("https://github.com/at67/Dedi;"            ) +
@@ -571,7 +571,7 @@ namespace Gui
         if(!loadOptions("options.ini")) return false;
 
         initStyles(0);
-
+        initServer();
         initWorldProperties();
 
         _fileDialogState = InitGuiWindowFileDialog(GetWorkingDirectory());

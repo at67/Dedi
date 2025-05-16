@@ -104,6 +104,7 @@ namespace Gui
 
     void handle();
 
+    void initServer();
     void handleServer(bool render=true);
     void handleServerEntries();
 

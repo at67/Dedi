@@ -34,8 +34,10 @@ namespace Win
     bool waitProcess(int ms=0);
     bool endProcess();
 
+    void clearConsoleText();
+    bool readConsoleText();
     bool readConsoleText(std::vector<std::string>& text);
-    size_t matchConsoleText(const std::string& match, std::string& line, bool erase=false);
+    size_t matchConsoleText(const std::string& match, std::string& line);
     void sendConsoleText(const std::string& text);
 
     std::string getHKLMRegStr(const std::string& subKey, const std::string& value);

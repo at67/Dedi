@@ -144,47 +144,42 @@ namespace Gui
     bool checkSteamConnected()
     {
         std::string line;
-        return (Win::matchConsoleText("Connected to Steam successfully", line, true) != std::string::npos);
+        return (Win::matchConsoleText("Connected to Steam successfully", line) != std::string::npos);
     }
 
     bool checkSteamClosed()
     {
         std::string line;
-        return (Win::matchConsoleText("Closing connection...", line, true) != std::string::npos);
+        return (Win::matchConsoleText("Closing connection...", line) != std::string::npos);
     }
 
     bool checkChatConnected()
     {
         std::string line;
-        return (Win::matchConsoleText("Connected to chat!", line, true) != std::string::npos);
+        return (Win::matchConsoleText("Connected to chat!", line) != std::string::npos);
     }
 
     bool checkChatDisconnected()
     {
         std::string line;
-        return (Win::matchConsoleText("Disconnected from chat", line, true) != std::string::npos);
+        return (Win::matchConsoleText("Disconnected from chat", line) != std::string::npos);
     }
 
     bool checkWorldStarted()
     {
         std::string line;
-        return (Win::matchConsoleText("Loading game world...", line, true) != std::string::npos);
+        return (Win::matchConsoleText("Loading game world...", line) != std::string::npos);
     }
 
     bool checkWorldStopped()
     {
         std::string line;
-        return (Win::matchConsoleText("Closing game world...", line, true) != std::string::npos);
+        return (Win::matchConsoleText("Closing game world...", line) != std::string::npos);
     }
 
     bool checkServerCrashed()
     {
-#if 0
-        std::string line;
-        return (Win::matchConsoleText("A crash has been intercepted by the crash handler.", line, true) != std::string::npos);
-#else
         return _serverExited;
-#endif
     }
 
     std::string getSaveFile()
@@ -240,7 +235,7 @@ namespace Gui
     bool checkPlayerConnected()
     {
         std::string player;
-        size_t pos = Win::matchConsoleText(" connected!", player, true);
+        size_t pos = Win::matchConsoleText(" connected!", player);
         if(pos == std::string::npos  ||  pos < 1) return false;
 
         player = player.substr(0, pos);
@@ -257,7 +252,7 @@ namespace Gui
     bool checkPlayerDisconnected()
     {
         std::string player;
-        size_t pos = Win::matchConsoleText(" disconnected!", player, true);
+        size_t pos = Win::matchConsoleText(" disconnected!", player);
         if(pos == std::string::npos  ||  pos < 1) return false;
 
         player = player.substr(0, pos);
@@ -272,7 +267,7 @@ namespace Gui
     bool checkWorldSaved()
     {
         std::string line;
-        return (Win::matchConsoleText("Saving: Flushing done!", line, true) != std::string::npos);
+        return (Win::matchConsoleText("Saving: Flushing done!", line) != std::string::npos);
     }
 
     void drawEnabledText(const std::string& text, int y, bool enable)
@@ -467,7 +462,7 @@ namespace Gui
             // Launch the Aska Dedicated Server process directly
             std::string cmd = "\"" + _appPath + "/AskaServer.exe\"" + " -propertiesPath " + "\"" + getDediConfig(InstallPath) + "/server properties.txt\"";
             _serverStarted = Win::createProcess("", cmd);
-            if(_serverStarted) Util::logStatus("Successfully started the Server");
+            if(_serverStarted) Util::logStatus("Starting the Server");
         }
     }
 
@@ -518,7 +513,7 @@ namespace Gui
         {
             static bool start = false;
 
-            bool ready = _foundSteam & _foundSteamCmd & _foundSteamToken & _foundAska & _foundAskaProps & _steamCmdInstalled & _steamCmdUpdated;
+            bool ready = _foundSteam && _foundSteamCmd && _foundSteamToken && _foundAska && _foundAskaProps && _steamCmdInstalled && _steamCmdUpdated;
             if(!ready) GuiSetState(STATE_DISABLED);
 
             button = _serverStarted ? "Stop" : "Start";
@@ -542,43 +537,41 @@ namespace Gui
         }
     }
 
-    void handleServer(bool render)
+    void initServer()
+    {
+        _foundSteam    = checkSteam();
+        _foundSteamCmd = checkSteamCmd();
+
+        _foundAska = checkAska();
+    }
+
+    void updateServer()
     {
         static bool steamConnected = _steamConnected;
         static bool worldActive    = _worldActive;
 
-        //if(_ticks % 120 == 0)
-        //{
-        //    if(backupSave("user"))   delOldestSave("user",   std::stoi(getDediConfig(MaxUserSaves), nullptr, 10));
-        //    if(backupSave("server")) delOldestSave("server", std::stoi(getDediConfig(MaxServerSaves), nullptr, 10));
-        //}
+        _steamConnected = (!_steamConnected) ? checkSteamConnected() : !checkSteamClosed();
+        _chatConnected  = (!_chatConnected)  ? checkChatConnected()  : !checkChatDisconnected();
+        _worldActive    = (!_worldActive)    ? checkWorldStarted()   : !checkWorldStopped();
 
-        // Check once a second
+        checkPlayerConnected();
+        checkPlayerDisconnected();
+            
+        if(checkWorldSaved())
+        {
+            if(backupSave("server")) delOldestSave("server", std::stoi(getDediConfig(MaxServerSaves), nullptr, 10));
+            
+            Util::logStatus("World saved successfully!");
+        }
+
+        if(!_steamCmdInstalled) _steamCmdInstalled = Steam::getSteamCmdInstalled();
+        if(!_steamCmdUpdated)   _steamCmdUpdated   = Steam::getSteamCmdUpdated();
+
+        // Check roughly once a second
         if(++_ticks % 60 == 0  ||  changedPage())
         {
-            _foundSteam      = checkSteam();
-            _foundSteamCmd   = checkSteamCmd();
             _foundSteamToken = checkSteamToken();
-
-            _foundAska      = checkAska();
             _foundAskaProps = checkAskaProps();
-
-            _steamConnected = (!_steamConnected) ? checkSteamConnected() : !checkSteamClosed();
-            _chatConnected  = (!_chatConnected)  ? checkChatConnected()  : !checkChatDisconnected();
-            _worldActive    = (!_worldActive)    ? checkWorldStarted()   : !checkWorldStopped();
-
-            _steamCmdInstalled = Steam::getSteamCmdInstalled();
-            _steamCmdUpdated   = Steam::getSteamCmdUpdated();
-
-            checkPlayerConnected();
-            checkPlayerDisconnected();
-
-            if(checkWorldSaved())
-            {
-                if(backupSave("server")) delOldestSave("server", std::stoi(getDediConfig(MaxServerSaves), nullptr, 10));
-
-                Util::logStatus("World saved successfully!");
-            }
         }
 
         if(!_serverStarted)
@@ -606,10 +599,15 @@ namespace Gui
 
         if(_worldActive  &&  !worldActive) _activeTimeStart = std::chrono::system_clock::now();
 
-        if(!_worldActive) _playerList.clear();
+        if(worldActive  &&  !_worldActive) _playerList.clear();
 
         steamConnected = _steamConnected;
         worldActive = _worldActive;
+    }
+
+    void handleServer(bool render)
+    {
+        updateServer();
 
         if(!render) return;
 

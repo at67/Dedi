@@ -45,7 +45,7 @@
 #define DLG_STR_LEN 1024
 
 // Gui file dialog context data
-typedef struct {
+typedef struct tagGuiWindowFileDialogState {
 
     // Window management variables
     bool windowActive;

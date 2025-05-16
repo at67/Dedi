@@ -1,4 +1,5 @@
-﻿#include <gui.h>
+﻿#include <win.h>
+#include <gui.h>
 #include <steam.h>
 
 
@@ -14,9 +15,10 @@ int main(int argc, char* argv[])
 
         ClearBackground(GetColor(GuiGetStyle(DEFAULT, BACKGROUND_COLOR)));
 
+        Win::readConsoleText();
         Steam::handle();
-
         Gui::handle();
+        Win::clearConsoleText();
 
         EndDrawing();
     }

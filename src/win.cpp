@@ -1,8 +1,4 @@
-﻿#ifndef DWMWA_USE_IMMERSIVE_DARK_MODE
-#define DWMWA_USE_IMMERSIVE_DARK_MODE 20
-#endif
-
-#include <win.h>
+﻿#include <win.h>
 #include <util.h>
 
 #include <windows.h>
@@ -22,6 +18,8 @@ namespace Win
     // We are guaranteed to create only one process at a time!
     static _PROCESS_INFORMATION _processInfo;
 
+    static std::vector<std::string> _consoleText;
+
 
     void initialise()
     {
@@ -33,7 +31,7 @@ namespace Win
     {
         HWND hWnd = HWND(handle);
         BOOL value = TRUE;
-        ::DwmSetWindowAttribute(hWnd, DWMWA_USE_IMMERSIVE_DARK_MODE, &value, sizeof(value));
+        ::DwmSetWindowAttribute(hWnd, 20, &value, sizeof(value));
     }
 
     bool getLastErrorStr(std::string& error)
@@ -58,7 +56,11 @@ namespace Win
         // https://learn.microsoft.com/en-us/windows/win32/api/shellapi/nf-shellapi-shellexecutea
         const auto kShellExecuteErrorLimit = 32; 
 
-        CoInitialize(nullptr);
+        if(CoInitialize(nullptr) != S_OK)
+        {
+            log(Util::FatalError, stderr, _f, _F, _L, "%s", "CoInitialize() : failed!");
+            return false;
+        }
 
         SHELLEXECUTEINFO info{sizeof(info)};
         info.fMask  = SEE_MASK_NOASYNC; // because we exit process after ShellExecuteEx()
@@ -71,6 +73,8 @@ namespace Win
             if(getLastErrorStr(errorStr)) log(Util::FatalError, stderr, _f, _F, _L, "%s", errorStr.c_str());
             return false;
         }
+
+        CoUninitialize();
 
         return true;
     }
@@ -333,6 +337,16 @@ namespace Win
         return true;
     }
 
+    void clearConsoleText()
+    {
+        _consoleText.clear();
+    }
+
+    bool readConsoleText()
+    {
+        return readConsoleText(_consoleText);
+    }
+
     bool readConsoleText(std::vector<std::string>& text)
     {
         CONSOLE_SCREEN_BUFFER_INFO csbi;
@@ -358,11 +372,20 @@ namespace Win
         }
         else
         {
+            const int lookAhead = 3;
             static std::string prev;
-            std::vector<char> chars(width + 1);
-            ReadConsoleOutputCharacter(hConsole, &chars[0], width, {0, csbi.dwCursorPosition.Y-1}, &charsRead);
+            std::vector<char> chars(width*lookAhead + 1);
+            ReadConsoleOutputCharacter(hConsole, &chars[0], width*lookAhead, {0, SHORT(csbi.dwCursorPosition.Y-lookAhead)}, &charsRead);
             chars[charsRead] = 0;
-            if(prev != &chars[0]) text.push_back(&chars[0]);
+            if(prev != &chars[0])
+            {
+                std::string wad = &chars[0];
+                for(int i=0; i<lookAhead; i++)
+                {
+                    std::string line = wad.substr(i*width, width);
+                    text.push_back(line);
+                }
+            }
             prev = &chars[0];
         }
 
@@ -371,33 +394,15 @@ namespace Win
         return true;
     }
 
-    size_t matchConsoleText(const std::string& match, std::string& line, bool erase)
+    size_t matchConsoleText(const std::string& match, std::string& line)
     {
-        CONSOLE_SCREEN_BUFFER_INFO csbi;
-        GetConsoleScreenBufferInfo(GetStdHandle(STD_OUTPUT_HANDLE), &csbi);
-
-        DWORD charsRead = 0;
-        HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
-        std::vector<char> chars(csbi.dwSize.X + 1);
-
-        for(SHORT y=0; y<csbi.dwSize.Y; y++)
+        for(size_t i=0; i<_consoleText.size(); i++)
         {
-            ReadConsoleOutputCharacter(hConsole, &chars[0], csbi.dwSize.X, {0, y}, &charsRead);
-            if(charsRead)
+            size_t pos = _consoleText[i].find(match);
+            if(pos != std::string::npos)
             {
-                chars[csbi.dwSize.X] = 0;
-                line = &chars[0];
-                size_t pos = line.find(match);
-                if(pos != std::string::npos)
-                {
-                    if(erase)
-                    {
-                        DWORD charsWritten = 0;
-                        std::string blank(pos + match.size(), ' ');
-                        WriteConsoleOutputCharacter(hConsole, blank.c_str(), DWORD(pos + match.size()), {0, y}, &charsWritten);
-                    }
-                    return pos;
-                }
+                line = _consoleText[i];
+                return pos;
             }
         }
 
