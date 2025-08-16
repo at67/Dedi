@@ -1,4 +1,6 @@
-﻿#include <util.h>
+﻿#include <subprocess.h>
+
+#include <util.h>
 #include <win.h>
 #include <steam.h>
 #include <gui.h>
@@ -7,15 +9,28 @@
 #include <set>
 #include <chrono>
 #include <fstream>
+#include <sstream>
 #include <thread>
 #include <atomic>
+#include <mutex>
 
 
 namespace Gui
 {
-    static bool _steamConnected = false;
-    static bool _chatConnected  = false;
-    static bool _worldActive    = false;
+    static std::mutex _playerMutex;
+    static std::string _playerName;
+
+    static std::atomic<bool> _steamConnected     = false;
+    static std::atomic<bool> _chatConnected      = false;
+    static std::atomic<bool> _worldActive        = false;
+    static std::atomic<bool> _worldSaved         = false;
+    static std::atomic<bool> _playerConnected    = false;
+    static std::atomic<bool> _playerDisconnected = false;
+
+    static std::atomic<bool> _serverStarted = false;
+    static std::atomic<bool> _serverExited  = false;
+
+    static bool _firstTime = true;
 
     static bool _foundSteam      = false;
     static bool _foundSteamCmd   = false;
@@ -27,12 +42,14 @@ namespace Gui
     static bool _steamCmdInstalled = false;
     static bool _steamCmdUpdated   = false;
 
-    static std::atomic<bool> _guiStarted    = true;
-    static std::atomic<bool> _serverStarted = false;
-    static std::atomic<bool> _serverExited  = false;
 
     void checkServerWorker();
     static std::thread _checkServerThread(checkServerWorker);
+
+    void stdinServerWorker();
+    static std::thread _stdinServerThread(stdinServerWorker);
+
+    static struct subprocess_s _subProcess;
 
     static uint64_t _ticks = 0;
 
@@ -141,47 +158,6 @@ namespace Gui
         return found;
     }
 
-    bool checkSteamConnected()
-    {
-        std::string line;
-        return (Win::matchConsoleText("Connected to Steam successfully", line) != std::string::npos);
-    }
-
-    bool checkSteamClosed()
-    {
-        std::string line;
-        return (Win::matchConsoleText("Closing connection...", line) != std::string::npos);
-    }
-
-    bool checkChatConnected()
-    {
-        std::string line;
-        return (Win::matchConsoleText("Connected to chat!", line) != std::string::npos);
-    }
-
-    bool checkChatDisconnected()
-    {
-        std::string line;
-        return (Win::matchConsoleText("Disconnected from chat", line) != std::string::npos);
-    }
-
-    bool checkWorldStarted()
-    {
-        std::string line;
-        return (Win::matchConsoleText("Loading game world...", line) != std::string::npos);
-    }
-
-    bool checkWorldStopped()
-    {
-        std::string line;
-        return (Win::matchConsoleText("Closing game world...", line) != std::string::npos);
-    }
-
-    bool checkServerCrashed()
-    {
-        return _serverExited;
-    }
-
     std::string getSaveFile()
     {
         char* appdata = getenv("APPDATA");
@@ -234,11 +210,15 @@ namespace Gui
 
     bool checkPlayerConnected()
     {
-        std::string player;
-        size_t pos = Win::matchConsoleText(" connected!", player);
-        if(pos == std::string::npos  ||  pos < 1) return false;
+        if(!_playerConnected) return false;
+        _playerConnected = false;
 
-        player = player.substr(0, pos);
+        std::string player;
+        {
+            std::scoped_lock lock(_playerMutex);
+            player = _playerName;
+        }
+
         if(_playerList.find(player) != _playerList.end()) return false;
 
         Util::logStatus("Player : " + player + " : connected");
@@ -251,23 +231,21 @@ namespace Gui
 
     bool checkPlayerDisconnected()
     {
-        std::string player;
-        size_t pos = Win::matchConsoleText(" disconnected!", player);
-        if(pos == std::string::npos  ||  pos < 1) return false;
+        if(!_playerDisconnected) return false;
+        _playerDisconnected = false;
 
-        player = player.substr(0, pos);
+        std::string player;
+        {
+            std::scoped_lock lock(_playerMutex);
+            player = _playerName;
+        }
+
         if(_playerList.find(player) == _playerList.end()) return false;
 
         Util::logStatus("Player : " + player + " : disconnected");
-        _playerList.erase(player.substr(0, pos));
+        _playerList.erase(player);
 
         return true;
-    }
-
-    bool checkWorldSaved()
-    {
-        std::string line;
-        return (Win::matchConsoleText("Saving: Flushing done!", line) != std::string::npos);
     }
 
     void drawEnabledText(const std::string& text, int y, bool enable)
@@ -428,7 +406,7 @@ namespace Gui
         const std::vector<ServerEntries> serverEntries1 = {Mode, TerrainAspect, TerrainHeight, StartingSeason, YearLength, Precipitation, DayLength, StructureDecay};
         xpos = drawServerEntries(serverEntries1, 365, 382, 20, 2);
 
-        const std::vector<ServerEntries> serverEntries2 = {InvasionDificulty, MonsterDensity, MonsterPopulation, WulfarPopulation, HerbivorePopulation, BearPopulation};
+        const std::vector<ServerEntries> serverEntries2 = {ClothingDecay, InvasionDificulty, MonsterDensity, MonsterPopulation, WulfarPopulation, HerbivorePopulation, BearPopulation};
         xpos = drawServerEntries(serverEntries2, 610, 382, 20, 0);
     }
 
@@ -438,15 +416,84 @@ namespace Gui
 
     void checkServerWorker()
     {
-        while(_guiStarted)
+        while(getGuiStarted())
         {
-            if(_serverStarted  &&  Win::waitProcess(100))
+            if(_serverStarted  &&  Win::waitProcess(100, _subProcess.hProcess))
             {
                 // Check _serverStarted again as it's updated in the main thread
                 if(_serverStarted) _serverExited = true;
             }
 
-            //printf("%d %d\n", _serverStarted.load(), _guiStarted.load());
+            Util::sleep_ms(100);
+        }
+    }
+
+    void stdinServerWorker()
+    {
+        struct MatchText
+        {
+            std::atomic<bool>* _condition = nullptr;
+            bool _result = false;
+            bool _player = false;
+            std::string _text;
+        };
+
+        const std::vector<MatchText> whiteList =
+        {
+            {&_steamConnected,     true,  false, "Connected to Steam successfully", },
+            {nullptr,              false, false, "Openning connection...",          },
+            {&_steamConnected,     false, false, "Closing connection...",           },
+            {nullptr,              false, false, "The session is now open!",        },
+            {nullptr,              false, false, "Received your UserID from server."},
+            {&_chatConnected,      true,  false, "Connected to chat!",              },
+            {&_chatConnected,      false, false, "Disconnected from chat",          },
+            {&_worldActive,        true,  false, "Loading game world...",           },
+            {&_worldActive,        false, false, "Closing game world...",           },
+            {&_playerConnected,    true,  true , " connected!",                     },
+            {&_playerDisconnected, true,  true , " disconnected!",                  },
+            {&_worldSaved,         true,  false, "Saving: Flushing done!",          },
+        };
+
+        char text[1024];
+
+        while(!getGuiStarted())
+        {
+            Util::sleep_ms(100);
+        }
+
+        while(getGuiStarted())
+        {
+            if(_serverStarted)
+            {
+                int read = subprocess_read_stdout(&_subProcess, text, 1023);
+                if(read)
+                {
+                    text[read] = 0;
+                    std::string line;
+                    std::stringstream stream(text);
+                    while(std::getline(stream, line))
+                    {
+                        for(size_t i=0; i<whiteList.size(); i++)
+                        {
+                            size_t pos = line.find(whiteList[i]._text);
+                            if(pos != std::string::npos)
+                            {
+                                // Set condition
+                                if(whiteList[i]._condition) *whiteList[i]._condition = whiteList[i]._result;
+
+                                // Save player name
+                                if(whiteList[i]._player)
+                                {
+                                    std::scoped_lock lock(_playerMutex);
+                                    _playerName = line.substr(0, pos);
+                                }
+                                printf("%s\n", line.c_str());
+                                break;
+                            }
+                        }
+                    }
+                }
+            }
 
             Util::sleep_ms(100);
         }
@@ -456,12 +503,10 @@ namespace Gui
     {
         if(!_serverStarted)
         {
-            // Don't execute the batch file as it's harder to terminate the Aska Dedicated Server process
-            //Win::createProcess("", getDediConfig(InstallPath) + "/" + getAskaConfig(AskaSvrBat));
-
-            // Launch the Aska Dedicated Server process directly
-            std::string cmd = "\"" + _appPath + "/AskaServer.exe\"" + " -propertiesPath " + "\"" + getDediConfig(InstallPath) + "/server properties.txt\"";
-            _serverStarted = Win::createProcess("", cmd);
+            std::string cmd = _appPath + "/AskaServer.exe";
+            std::string arg = getDediConfig(InstallPath) + "/server properties.txt";
+            const char *cmdLine[] = {cmd.c_str(), "-propertiesPath", arg.c_str(), NULL};
+            _serverStarted = (subprocess_create(cmdLine, subprocess_option_enable_async | subprocess_option_inherit_environment, &_subProcess) == 0);
             if(_serverStarted) Util::logStatus("Starting the Server");
         }
     }
@@ -470,7 +515,8 @@ namespace Gui
     {
         if(_serverStarted)
         {
-            _serverStarted = !Win::endProcess();
+            subprocess_terminate(&_subProcess);
+            _serverStarted = !(subprocess_destroy(&_subProcess) == 0);
             if(!_serverStarted)
             {
                 for(const auto& p : _playerList)
@@ -484,10 +530,11 @@ namespace Gui
 
     void shutdownServer()
     {
-        _guiStarted = false;
         _serverStarted = false;
+        subprocess_terminate(&_subProcess);
+        subprocess_destroy(&_subProcess);
         _checkServerThread.join();
-        Win::endProcess();
+        _stdinServerThread.join();
     }
 
     void handleServerButtons()
@@ -505,7 +552,7 @@ namespace Gui
             {
                 install = false;
                 GuiSetState(STATE_DISABLED);
-                Steam::setCmdOp(Steam::CmdInit);
+                Steam::setSteamCmdOp(Steam::SteamCmdInit);
             }
         }
         // Start-Stop server
@@ -550,30 +597,27 @@ namespace Gui
         static bool steamConnected = _steamConnected;
         static bool worldActive    = _worldActive;
 
-        _steamConnected = (!_steamConnected) ? checkSteamConnected() : !checkSteamClosed();
-        _chatConnected  = (!_chatConnected)  ? checkChatConnected()  : !checkChatDisconnected();
-        _worldActive    = (!_worldActive)    ? checkWorldStarted()   : !checkWorldStopped();
-
         checkPlayerConnected();
         checkPlayerDisconnected();
             
-        if(checkWorldSaved())
+        if(_worldSaved)
         {
+            _worldSaved = false;
             if(backupSave("server")) delOldestSave("server", std::stoi(getDediConfig(MaxServerSaves), nullptr, 10));
-            
             Util::logStatus("World saved successfully!");
         }
 
         if(!_steamCmdInstalled) _steamCmdInstalled = Steam::getSteamCmdInstalled();
         if(!_steamCmdUpdated)   _steamCmdUpdated   = Steam::getSteamCmdUpdated();
 
-        // Check roughly once a second
-        if(++_ticks % 60 == 0  ||  changedPage())
+        // Check if page changes
+        if(_firstTime  ||  changedPage())
         {
             _foundSteamToken = checkSteamToken();
             _foundAskaProps = checkAskaProps();
         }
 
+        // Server stopped
         if(!_serverStarted)
         {
             _steamConnected = false;
@@ -581,10 +625,17 @@ namespace Gui
             _worldActive = false;
         }
 
-        if(checkServerCrashed())
+        // Chat error
+        if(_worldActive  &&  !_chatConnected)
         {
-            Util::logStatus("Server crashed, restarting server");
+            _steamConnected = false;
+            _worldActive = false;
+            _serverStarted = false;
+        }
 
+        // Server crash
+        if(_serverExited)
+        {
             _serverExited   = false;
             _steamConnected = false;
             _chatConnected  = false;
@@ -593,6 +644,7 @@ namespace Gui
             _serverCrashes++;
             _ticks = 0;
             startServer();
+            Util::logStatus("Server crashed, restarting server");
         }
 
         if(_steamConnected  &&  !steamConnected) _upTimeStart = std::chrono::system_clock::now();
@@ -603,6 +655,8 @@ namespace Gui
 
         steamConnected = _steamConnected;
         worldActive = _worldActive;
+
+        _firstTime = false;
     }
 
     void handleServer(bool render)

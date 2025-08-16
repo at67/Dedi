@@ -2,6 +2,7 @@
 
 #include <string>
 #include <vector>
+#include <atomic>
 
 
 namespace Gui
@@ -15,11 +16,12 @@ namespace Gui
     enum ServerEntries
     {
         ProfileName=0, DisplayName, ServerName, Password, SaveId, Seed, SteamGamePort, SteamQueryPort, AuthenticationToken, Region, KeepServerWorldAlive,
-        AutosaveStyle, Mode, TerrainAspect, TerrainHeight, StartingSeason, YearLength, Precipitation, DayLength, StructureDecay, InvasionDificulty,
-        MonsterDensity, MonsterPopulation, WulfarPopulation, HerbivorePopulation, BearPopulation, NumServerEntries
+        AutosaveStyle, Mode, TerrainAspect, TerrainHeight, StartingSeason, YearLength, Precipitation, DayLength, StructureDecay, ClothingDecay,
+        InvasionDificulty, MonsterDensity, MonsterPopulation, WulfarPopulation, HerbivorePopulation, BearPopulation, NumServerEntries
     };
     enum MiscEntries {EnableToolTips=0, EnableMenusTimeout, EnableStylesTimeout, EnableStatusAutoScroll, EnableWorldGen, NumMiscEntries};
 
+    const std::atomic<bool>& getGuiStarted();
 
     const std::string& getAppPath();
 

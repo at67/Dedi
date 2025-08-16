@@ -2,18 +2,18 @@
 
 #include <string>
 #include <vector>
+#include <atomic>
 
 
 namespace Steam
 {
-    enum CmdOp {CmdIdle, CmdInit, CmdWaitCoup, CmdWaitDone, CmdInstall, CmdUpdate};
+    enum SteamCmdOp {SteamCmdIdle=0, SteamCmdInit, SteamCmdInstall, SteamCmdInstallWait, SteamCmdUpdate, SteamCmdUpdateWait};
 
 
     bool getSteamCmdInstalled();
     bool getSteamCmdUpdated();
 
-    CmdOp getCmdOp();
-    void setCmdOp(CmdOp cmdOp);
+    void setSteamCmdOp(SteamCmdOp);
 
     bool parseSteamVdf(std::vector<std::string>& libraryFolders);
     bool searchAppManifest(const std::vector<std::string>& folders, const std::string& search, const std::string& app, std::string& path);

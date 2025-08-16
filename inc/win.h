@@ -32,6 +32,7 @@ namespace Win
 
     bool createProcess(const std::string& name, const std::string& command);
     bool waitProcess(int ms=0);
+    bool waitProcess(int ms, void* hProcess);
     bool endProcess();
 
     void clearConsoleText();

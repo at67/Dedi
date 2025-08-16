@@ -11,8 +11,8 @@ namespace Gui
 {
     static std::unordered_map<World::SettingsType, char> _worldSettings;
 
-    enum WorldEntries {WorldTerrainAspect=0, WorldTerrainHeight, WorldStartingSeason, WorldYearLength, WorldPrecipitation, WorldDayLength, WorldStructureDecay, WorldInvasionDificulty,
-                       WorldMonsterDensity, WorldMonsterPopulation, WorldWulfarPopulation, WorldHerbivorePopulation, WorldBearPopulation, NumWorldEntries};
+    enum WorldEntries {WorldTerrainAspect=0, WorldTerrainHeight, WorldStartingSeason, WorldYearLength, WorldPrecipitation, WorldDayLength, WorldStructureDecay, WorldClothingDecay,
+                       WorldInvasionDifficulty, WorldMonsterDensity, WorldMonsterPopulation, WorldWulfarPopulation, WorldHerbivorePopulation, WorldBearPopulation, NumWorldEntries};
 
     struct WorldEntry
     {
@@ -36,6 +36,7 @@ namespace Gui
         {World::Precipitation,       "Custom game, Weather setting, 0 (sunny) to 6 (soggy)", "0;1;2;3;4;5;6",                            "3",       3, false, STATE_NORMAL, 300},
         {World::DayLength,           "Custom game, Day setting",                             "minimum;reduced;default;extended;maximum", "default", 2, false, STATE_NORMAL, 300},
         {World::StructureDecay,      "Custom game, Structure decay",                         "low;medium;high",                          "medium",  1, false, STATE_NORMAL, 300},
+        {World::ClothingDecay,       "Custom game, Clothing decay",                          "low;medium;high",                          "medium",  1, false, STATE_NORMAL, 300},
         {World::InvasionDifficulty,  "Custom game, Invasion difficulty",                     "off;easy;normal;viking",                   "normal",  2, false, STATE_NORMAL, 300},
         {World::MonsterDensity,      "Custom game, Monster density",                         "off;low;medium;high",                      "medium",  2, false, STATE_NORMAL, 300},
         {World::MonsterPopulation,   "Custom game, Monster population",                      "low;medium;high",                          "medium",  1, false, STATE_NORMAL, 300},
@@ -81,7 +82,7 @@ namespace Gui
         handleWorldEntries(30 + 210*0, 85, 0, 3);
         handleWorldEntries(30 + 210*1, 85, 4, 7);
         handleWorldEntries(30 + 210*2, 85, 8, 11);
-        handleWorldEntries(30 + 210*3, 85, 12, 12);
+        handleWorldEntries(30 + 210*3, 85, 12, 13);
     }
 
     void handleWorldTooltips(int x, int y, int startEntry, int endEntry)
@@ -109,7 +110,7 @@ namespace Gui
         handleWorldTooltips(30 + 210*0, 85, 0, 3);
         handleWorldTooltips(30 + 210*1, 85, 4, 7);
         handleWorldTooltips(30 + 210*2, 85, 8, 11);
-        handleWorldTooltips(30 + 210*3, 85, 12, 12);
+        handleWorldTooltips(30 + 210*3, 85, 12, 13);
     }
 
     std::string getWorldGenFile()

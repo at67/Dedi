@@ -308,10 +308,10 @@ namespace Win
         return true;
     }
 
-    bool waitProcess(int ms)
+    bool waitProcess(int ms, void* hProcess)
     {
         if(ms == 0) ms = INFINITE;
-        DWORD result = WaitForSingleObject(_processInfo.hProcess, DWORD(ms));
+        DWORD result = WaitForSingleObject(hProcess, DWORD(ms));
         if(result != WAIT_OBJECT_0  &&  result != WAIT_TIMEOUT)
         {
             std::string error;
@@ -322,14 +322,21 @@ namespace Win
         return (result == WAIT_OBJECT_0);
     }
 
+    bool waitProcess(int ms)
+    {
+        return waitProcess(ms, _processInfo.hProcess);
+    }
+
     bool endProcess()
     {
-        if(!TerminateProcess(_processInfo.hProcess, 0))
-        {
-            std::string error;
-            if(getLastErrorStr(error)) log(Util::WarnError, stderr, _f, _F, _L, "%s", error.c_str());
-            return false;
-        }
+        waitProcess(100);
+
+        //if(!TerminateProcess(_processInfo.hProcess, 0))
+        //{
+        //    std::string error;
+        //    if(getLastErrorStr(error)) log(Util::WarnError, stderr, _f, _F, _L, "%s", error.c_str());
+        //    return false;
+        //}
 
         CloseHandle(_processInfo.hProcess);
         CloseHandle(_processInfo.hThread);
@@ -362,7 +369,7 @@ namespace Win
 
         if(csbi.dwCursorPosition.Y < height-1)
         {
-            for(SHORT y=cursorY; y<csbi.dwCursorPosition.Y; y++)
+            for(SHORT y=cursorY; y<=csbi.dwCursorPosition.Y; y++)
             {
                 std::vector<char> chars(width + 1);
                 ReadConsoleOutputCharacter(hConsole, &chars[0], width, {0, y}, &charsRead);
@@ -372,21 +379,21 @@ namespace Win
         }
         else
         {
-            const int lookAhead = 3;
+            int historyLines = (height >= 3) ? 3 : 1;
             static std::string prev;
-            std::vector<char> chars(width*lookAhead + 1);
-            ReadConsoleOutputCharacter(hConsole, &chars[0], width*lookAhead, {0, SHORT(csbi.dwCursorPosition.Y-lookAhead)}, &charsRead);
+            std::vector<char> chars(width*historyLines + 1);
+            ReadConsoleOutputCharacter(hConsole, &chars[0], width*historyLines, {0, SHORT(csbi.dwCursorPosition.Y - (historyLines-1))}, &charsRead);
             chars[charsRead] = 0;
             if(prev != &chars[0])
             {
+                prev = &chars[0];
                 std::string wad = &chars[0];
-                for(int i=0; i<lookAhead; i++)
+                for(int i=0; i<historyLines; i++)
                 {
                     std::string line = wad.substr(i*width, width);
                     text.push_back(line);
                 }
             }
-            prev = &chars[0];
         }
 
         cursorY = csbi.dwCursorPosition.Y;

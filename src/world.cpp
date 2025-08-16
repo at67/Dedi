@@ -19,8 +19,8 @@ namespace World
     const std::unordered_map<SettingsType, std::string> SettingsNames = 
     {
         {TerrainAspect, "TerrainAspect"}, {TerrainHeight, "TerrainHeight"}, {StartingSeason, "StartingSeason"}, {YearLength, "YearLength"}, {Precipitation, "Precipitation"}, {DayLength, "DayLength"},
-        {StructureDecay, "StructureDecay"}, {InvasionDifficulty, "InvasionDifficulty"}, {MonsterDensity, "MonsterDensity"}, {MonsterPopulation, "MonsterPopulation"}, {WulfarPopulation, "WulfarPopulation"},
-        {HerbivorePopulation, "HerbivorePopulation"}, {BearPopulation, "BearPopulation"}
+        {StructureDecay, "StructureDecay"}, {ClothingDecay, "ClothingDecay"}, {InvasionDifficulty, "InvasionDifficulty"}, {MonsterDensity, "MonsterDensity"}, {MonsterPopulation, "MonsterPopulation"},
+        {WulfarPopulation, "WulfarPopulation"}, {HerbivorePopulation, "HerbivorePopulation"}, {BearPopulation, "BearPopulation"}, 
     };
 
 
@@ -143,6 +143,7 @@ namespace World
         // Settings
         for(int i=0; i<_settingsCount; i++)
         {
+            //printf("%0x\n", _buffer[_settingsStart + SETTING_TYPE_INDEX + i*SETTING_LENGTH]);
             SettingsType settingsType = SettingsType(_buffer[_settingsStart + SETTING_TYPE_INDEX + i*SETTING_LENGTH]);
             char settingsValue = _buffer[_settingsStart + SETTING_VALUE_INDEX + i*SETTING_LENGTH];
             settings[settingsType] = settingsValue;

@@ -9,7 +9,7 @@
 
 namespace World
 {
-    enum SettingsType {TerrainAspect=0x05, TerrainHeight=0x06, StartingSeason=0x12, YearLength=0x13, Precipitation=0x14, DayLength=0x15, StructureDecay=0x16,
+    enum SettingsType {TerrainAspect=0x05, TerrainHeight=0x06, StartingSeason=0x12, YearLength=0x13, Precipitation=0x14, DayLength=0x15, StructureDecay=0x16, ClothingDecay=0x63,
                        InvasionDifficulty=0x17, MonsterDensity=0x34, MonsterPopulation=0x3D, WulfarPopulation=0x24, HerbivorePopulation=0x32, BearPopulation=0x57};
 
 

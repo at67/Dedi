@@ -6,20 +6,21 @@
 #include <steam.h>
 #include <access.h>
 
+#include <sstream>
+
 
 namespace Steam
 {
     static bool _steamCmdInstalled = false;
     static bool _steamCmdUpdated   = false;
 
-    static CmdOp _cmdOp = CmdIdle;
+    static SteamCmdOp _steamCmdOp = SteamCmdIdle;
 
 
     bool getSteamCmdInstalled() {return _steamCmdInstalled;}
     bool getSteamCmdUpdated()   {return _steamCmdUpdated;  }
 
-    CmdOp getCmdOp() {return _cmdOp;}
-    void setCmdOp(CmdOp cmdOp) {_cmdOp = cmdOp;}
+    void setSteamCmdOp(SteamCmdOp steamCmdOp) {_steamCmdOp = steamCmdOp;}
 
 
     bool parseSteamVdf(std::vector<std::string>& libraryFolders)
@@ -44,7 +45,7 @@ namespace Steam
 
     bool searchAppManifest(const std::vector<std::string>& folders, const std::string& id, const std::string& app, std::string& path)
     {
-        for(auto i=0; i<folders.size(); i++)
+        for(size_t i=0; i<folders.size(); i++)
         {
             DIR* dir;
             if((dir = opendir(folders[i].c_str())) != nullptr)
@@ -84,17 +85,6 @@ namespace Steam
         return false;
     }
 
-    bool update()
-    {
-        std::string steamCmdPath = Gui::getDediConfig(Gui::InstallPath) + "/" + Gui::getSteamCmdConfig(Gui::PathSteamCmd);
-        Win::createProcess(steamCmdPath + "/" + Gui::getSteamCmdConfig(Gui::ExecSteamCmd), "");
-
-        Win::sendConsoleText(Gui::getSteamCmdConfig(Gui::OpenSteamCmd));
-        Win::sendConsoleText(Gui::getSteamCmdConfig(Gui::AppUSteamCmd) + " " + Gui::getAskaConfig(Gui::AskaSvrAppId));
-
-        return true;
-    }
-
     bool install()
     {
         // Destination folders
@@ -106,7 +96,19 @@ namespace Steam
         // SteamCmd
         Win::downloadLink(Gui::getSteamCmdConfig(Gui::HTTPSteamCmd), steamCmdExec);
         Util::decompressZLibArchive(steamCmdExec, steamCmdPath, _F, _L);
+
         Win::createProcess(steamCmdPath + "/" + Gui::getSteamCmdConfig(Gui::ExecSteamCmd), "");
+
+        return true;
+    }
+
+    bool update()
+    {
+        std::string steamCmdPath = Gui::getDediConfig(Gui::InstallPath) + "/" + Gui::getSteamCmdConfig(Gui::PathSteamCmd);
+        Win::createProcess(steamCmdPath + "/" + Gui::getSteamCmdConfig(Gui::ExecSteamCmd), "");
+
+        Win::sendConsoleText(Gui::getSteamCmdConfig(Gui::OpenSteamCmd));
+        Win::sendConsoleText(Gui::getSteamCmdConfig(Gui::AppUSteamCmd) + " " + Gui::getAskaConfig(Gui::AskaSvrAppId));
 
         return true;
     }
@@ -129,69 +131,92 @@ namespace Steam
 
     void handle()
     {
-        // Simple state machine that handles installs and updates
-        switch(_cmdOp)
-        {
-            case CmdIdle: return;
+        if(_steamCmdOp != SteamCmdIdle) Win::readConsoleText();
 
-            case CmdWaitCoup:
+        // Simple state machine that handles installs and updates
+        switch(_steamCmdOp)
+        {
+            case SteamCmdIdle: return;
+
+            case SteamCmdInit:
             {
-                if(wait(Gui::getSteamCmdConfig(Gui::CoupSteamCmd)))
+                if(!Util::fileExists(Gui::getDediConfig(Gui::InstallPath) + "/" + Gui::getSteamCmdConfig(Gui::PathSteamCmd) + "/" + Gui::getSteamCmdConfig(Gui::ExecSteamCmd)))
                 {
-                    _cmdOp = CmdIdle;
-                    _steamCmdUpdated = true;
-                    Util::logStatus("Successfully updated SteamCmd");
+                    _steamCmdOp = SteamCmdInstall;
+                    return;
+                }
+
+                _steamCmdInstalled = true;
+                _steamCmdOp = SteamCmdUpdate;
+            }
+            break;
+
+            case SteamCmdInstall:
+            {
+                _steamCmdInstalled = false;
+                Util::logStatus("Starting SteamCmd install");
+                if(install())
+                {
+                    _steamCmdOp = SteamCmdInstallWait;
+                }
+                else
+                {
+                    _steamCmdOp = SteamCmdIdle;
+                    Util::logStatus("Couldn't start SteamCmd install");
                 }
             }
             break;
 
-            case CmdWaitDone:
+            case SteamCmdInstallWait:
             {
                 if(wait(Gui::getSteamCmdConfig(Gui::DoneSteamCmd)))
                 {
-                    _cmdOp = CmdUpdate;
+                    Win::endProcess();
                     _steamCmdInstalled = true;
+                    _steamCmdOp = SteamCmdUpdate;
                     Util::logStatus("Successfully installed SteamCmd");
                 }
             }
             break;
 
-            case CmdInit:
+            case SteamCmdUpdate:
             {
                 if(!Util::fileExists(Gui::getDediConfig(Gui::InstallPath) + "/" + Gui::getSteamCmdConfig(Gui::PathSteamCmd) + "/" + Gui::getSteamCmdConfig(Gui::ExecSteamCmd)))
                 {
-                    _cmdOp = CmdInstall;
-                    return;
-                }
-
-                _cmdOp = CmdUpdate;
-            }
-            break;
-
-            case CmdInstall:
-            {
-                _steamCmdInstalled = false;
-                install();
-                _cmdOp = CmdWaitDone;
-            }
-            break;
-
-            case CmdUpdate:
-            {
-                if(!Util::fileExists(Gui::getDediConfig(Gui::InstallPath) + "/" + Gui::getSteamCmdConfig(Gui::PathSteamCmd) + "/" + Gui::getSteamCmdConfig(Gui::ExecSteamCmd)))
-                {
-                    _cmdOp = CmdIdle;
+                    _steamCmdOp = SteamCmdInstall;
                     return;
                 }
 
                 _steamCmdInstalled = true;
                 _steamCmdUpdated = false;
-                update();
-                _cmdOp = CmdWaitCoup;
+                Util::logStatus("Starting SteamCmd update");
+                if(update())
+                {
+                    _steamCmdOp = SteamCmdUpdateWait;
+                }
+                else
+                {
+                    _steamCmdOp = SteamCmdIdle;
+                    Util::logStatus("Couldn't start SteamCmd update");
+                }
+            }
+            break;
+
+            case SteamCmdUpdateWait:
+            {
+                if(wait(Gui::getSteamCmdConfig(Gui::CoupSteamCmd)))
+                {
+                    Win::endProcess();
+                    _steamCmdUpdated = true;
+                    _steamCmdOp = SteamCmdIdle;
+                    Util::logStatus("Successfully updated SteamCmd");
+                }
             }
             break;
 
             default: break;
         }
+
+        if(_steamCmdOp != SteamCmdIdle) Win::clearConsoleText();
     }
 }

@@ -26,6 +26,7 @@ include_directories(inc/inih)
 include_directories(inc/miniz)
 include_directories(inc/raygui)
 include_directories(inc/raylib)
+include_directories(inc/subprocess)
 include_directories(inc/vdf)
 
 add_executable(Dedi ${headers} ${sources})

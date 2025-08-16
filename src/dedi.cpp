@@ -1,5 +1,4 @@
-﻿#include <win.h>
-#include <gui.h>
+﻿#include <gui.h>
 #include <steam.h>
 
 
@@ -7,7 +6,7 @@ int main(int argc, char* argv[])
 {
     Gui::initialise();
 
-    Steam::setCmdOp(Steam::CmdUpdate);
+    Steam::setSteamCmdOp(Steam::SteamCmdUpdate);
 
     while(!WindowShouldClose())
     {
@@ -15,14 +14,13 @@ int main(int argc, char* argv[])
 
         ClearBackground(GetColor(GuiGetStyle(DEFAULT, BACKGROUND_COLOR)));
 
-        Win::readConsoleText();
         Steam::handle();
         Gui::handle();
-        Win::clearConsoleText();
 
         EndDrawing();
     }
 
+    Gui::shutdownGui();
     Gui::shutdownServer();
 
     CloseWindow();

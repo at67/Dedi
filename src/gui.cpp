@@ -10,10 +10,13 @@
 #include <unordered_map>
 #include <vector>
 #include <fstream>
+#include <atomic>
 
 
 namespace Gui
 {
+    static std::atomic<bool> _guiStarted = false;
+
     static std::map<std::string, int> _styleIndices;
     static std::vector<std::string> _styleNames;
     static std::string _stylesFolder;
@@ -27,6 +30,8 @@ namespace Gui
 
     static GuiWindowFileDialogState _fileDialogState;
 
+
+    const std::atomic<bool>& getGuiStarted() {return _guiStarted;}
 
     bool changedPage() {return _page != _prevPage;}
 
@@ -225,34 +230,6 @@ namespace Gui
     void handleStatus()
     {
         Status::draw("Status", {20.0f, 605.0f, 830.0f, 130.0f});
-
-#if 0
-#if 0
-        std::vector<std::string> text;
-        if(Win::readConsoleText(text))
-        {
-            for(size_t i=0; i<text.size(); i++)
-            {
-                Util::rtrim(text[i]);
-                if(text[i].size() == 0) text[i].push_back(' ');
-                Util::logStatus(text[i]);
-            }
-        }
-#else
-        static int tick = 0;
-        if(++tick % 120 == 0)
-        {
-            static char text[MAX_STR_TEXT];
-            int len = rand() % 226 + 10;
-            int i = 0;
-            for(; i<10; i++) text[i] = 48 + i;
-            for(; i<len; i++) text[i] = rand() % 26 + 'a';
-            for(; i<len+10; i++) text[i] = 48 + (9 - (i-len));
-            text[i] = 0;
-            Util::logStatus(text);
-        }
-#endif
-#endif
     }
 
     void handleOptionsReset()
@@ -470,7 +447,7 @@ namespace Gui
         if(!about) return;
 
         const std::string aboutText = std::string("Dedi: Aska Dedicated Server Manager\n") + 
-                                      std::string("Version: v0.20\n"                     ) +
+                                      std::string("Version: v0.25\n"                     ) +
                                       std::string("Author: at67"                         );
 
         const std::string libText = std::string("https://github.com/at67/Dedi;"            ) +
@@ -576,6 +553,13 @@ namespace Gui
 
         _fileDialogState = InitGuiWindowFileDialog(GetWorkingDirectory());
         
+        _guiStarted = true;
+
         return true;
+    }
+
+    void shutdownGui()
+    {
+        _guiStarted = false;
     }
 }

@@ -131,4 +131,5 @@ namespace Gui
     bool initWorldProperties();
 
     void shutdownServer();
+    void shutdownGui();
 }
