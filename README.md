@@ -6,42 +6,85 @@ Is a Windows 10/11 only tool that allows for the simple installation, monitoring
 - Added ClothingDecay to "server properties.txt" handling.
 - Added ClothingDecay to "worldgen" handling.
 
-## Features
-- Open Source: https://github.com/at67/Dedi<br/>
-- Simplifies the installation of the server to a couple of mouse clicks.<br/>
-- Real-time monitoring of many aspects of the server.<br/>
-- Displays Up-Time, Active-Time and the current player list.<br/>
-- Has a comprehensive configuration editor for the creation of new servers and maintenance of active servers.<br/>
-- Has a world editor for the editing of custom game properties, (for already active servers): see https://worldgen.aska.houseofpain.games as the inspiration for this feature.<br/>
-- Has a status display that keeps you constantly informed about the server's health.<br/>
-- Is able to restart the server after a server crash or unknown server shutdown.<br/>
-- Automatically creates backups of all important files before attempting anything of a serious nature.<br/>
-- Creates a backup of your server's save file for every player that logs in to the server, (this allows a simple rollback mechanism for miscreant players).<br/>
+## What Dedi Does For You
+
+- **Automatic SteamCmd setup** - No command line needed
+- **Automatic server downloads** - Always the latest Aska Server version
+- **Auto-restart on crashes** - Never stays down
+- **Player join backups** - Rollback griefers instantly
+- **Real-time monitoring** - See who's connected
+- **One-click start/stop** - No batch files or commands
 
 ## Install
 - Download the latest release at: https://github.com/at67/Dedi/releases<br/>
-- The zip file should contain one folder and two files:
+- The zip file should contain one folder and three files:
 	- styles, (folder)
-	- Dedi.exe, (file)
+	- Dedi_x64.exe, (file)
+	- Dedi_x86.exe, (file)
 	- viking.png, (file)
 - Create a folder with at least 5 GBytes of free space, (more if you plan on using multiple servers or a large number of backup saves).
 - Copy the contents of Dedi.zip into this newly created folder, eg: C:\Dedi<br/>
 	C:\Dedi\styles<br/>
-	C:\Dedi\Dedi.exe<br/>
+	C:\Dedi\Dedi_x64.exe<br/>
+	C:\Dedi\Dedi_x86.exe<br/>
 	C:\Dedi\viking.png<br/>
 
-## User Guide
+## Usage
+- Run either Dedi_x64.exe or Dedi_x86.exe depending on your OS, if it is 32bit use Dedi_x86.exe, otherwise use Dedi_x64.exe.
+- If you unsure, then use Dedi_x86.exe.
+- You will receive an unsigned warning from Windows, this is normal and expected, to remove this I would have to pay approximately $1000(US) per year to obtain a legitimate signed certificate.
+- if you're worried even remotely about the unsigned warning then please just delete Dedi from your system.
+- Dedi has been tested on Win10 and Win11, not Linux or VM's.
 
-TODO:
-<br/>
-<br/>
+## Quick Start (3 Steps)
 
-## Advanced
+### Step 1: Install Dedi (2 minutes)
+1. Download from https://github.com/at67/Dedi/releases
+2. Extract to a new folder (e.g., `C:\Dedi`) - **NOT in your Aska game folder**
+3. Run `Dedi_x64.exe` (or `Dedi_x86.exe` for 32-bit)
+4. Click through Windows security warning (normal for unsigned software)
 
-TODO:
-<br/>
-<br/>
+### Step 2: Get Steam Token (3 minutes)
+1. In Dedi, click **Get Token** button (opens Steam website)
+2. Login to Steam, create game server account:
+   - App ID: `1898300` (already filled in)
+   - Memo: Any name you want (just for your reference)
+3. Copy the long token string
+4. Paste in Dedi **Config** tab → **Server** section → **Steam Token** field
+5. Click **Generate** button
 
-### Screenshot
+### Step 3: Install & Start (5 minutes)
+1. Go to **Server** tab
+2. Click **Install** - this downloads everything automatically
+3. Wait for all checkmarks to turn green ✅
+4. Click **Start**
+5. Your server is running when you see "Aska World active" ✅
+
+**Done!** Your server appears in Aska's multiplayer browser.
+
+## Basic Configuration
+
+### Server Identity
+**Config** tab → **Server** section:
+- **Server Name**: What players see in server browser
+- **Password**: Leave empty for public, set for private
+- **Region**: Choose your location
+
+### Save Selection
+- **SaveId button**: Browse to your existing Aska save
+- Or start with default empty world
+
+That's it! Advanced settings are optional.
+
+## Server Management
+[Server Management Guide](doc/Server_Management_Guide.pdf)
+
+## Configuration Reference
+[Configuration Reference](doc/Configuration_Reference.pdf)
+
+## Troubleshooting Guide
+[Troubleshooting Guide](doc/Troubleshooting_Guide.pdf)
+
+## Screenshot
 
 ![Dedi](dedi.png)
