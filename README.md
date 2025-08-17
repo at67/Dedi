@@ -2,6 +2,10 @@
 # Dedi
 Is a Windows 10/11 only tool that allows for the simple installation, monitoring and control of the Aska Dedicated Server.
 
+## Latest, V0.25
+- Added ClothingDecay to "server properties.txt" handling.
+- Added ClothingDecay to "worldgen" handling.
+
 ## Features
 - Open Source: https://github.com/at67/Dedi<br/>
 - Simplifies the installation of the server to a couple of mouse clicks.<br/>
