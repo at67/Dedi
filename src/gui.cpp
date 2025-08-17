@@ -100,8 +100,7 @@ namespace Gui
         for(int i=0; i<numEntries; i++)
         {
             // Update value
-            std::string value = iniReader.Get(section, guiEntries[i]._key, "!!!!");
-            if(value == "!!!!") return false;
+            std::string value = iniReader.Get(section, guiEntries[i]._key, guiEntries[i]._default);
             Util::strcpy(guiEntries[i]._value, value, MAX_CONFIG_TEXT, _F, _L);
 
             switch(guiEntries[i]._type)
