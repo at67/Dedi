@@ -93,7 +93,7 @@ If you see either or both of these errors:<br/>
 Then you need to download and install the Microsoft VC Redistributable from here:<br/>
 https://learn.microsoft.com/en-us/cpp/windows/latest-supported-vc-redist?view=msvc-170<br/>
 <br/>
-If you are trying to run my launcher from a VM, it requires at a minimum OpenGL3.3, so you must enable "3D acceleration", (or similar), in your VM settings and then pray.<br/>
+If you are trying to run my launcher from a VM, it requires at a minimum of OpenGL3.3, so you must enable "3D acceleration", (or similar), in your VM settings and then pray.<br/>
 
 ## Screenshot
 ![Dedi](dedi.png)
