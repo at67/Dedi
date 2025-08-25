@@ -59,9 +59,10 @@ Is a Windows 10/11 only tool that allows for the simple installation, monitoring
 ### Step 3: Install & Start (5 minutes)
 1. Go to **Server** tab
 2. Click **Install** - this downloads everything automatically
-3. Wait for all checkmarks to turn green ✅
-4. Click **Start**
-5. Your server is running when you see "Aska World active" ✅
+3. Wait for all appropriate checkmarks to turn green ✅
+4. If the **Start** button is disabled, then head to Troubleshooting.
+5. Click **Start**
+6. Your server is running when you see "Aska Server connected to Chat" ✅
 
 **Done!** Your server appears in Aska's multiplayer browser.
 
