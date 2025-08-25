@@ -86,14 +86,14 @@ That's it! Advanced settings are optional.
 [Configuration Reference](doc/Configuration_Reference.pdf)
 
 ## Troubleshooting Guide
-[Troubleshooting Guide](doc/Troubleshooting_Guide.pdf)
-If you see either or both of these errors:
+[Troubleshooting Guide](doc/Troubleshooting_Guide.pdf)<br/>
+If you see either or both of these errors:<br/>
 ![MSVCP](MSVCP_error.png)
 ![VCRUNTIME](VCRUNTIME_error.png)
-Then you need to download and install the Microsoft VC Redistributable from here:
-https://learn.microsoft.com/en-us/cpp/windows/latest-supported-vc-redist?view=msvc-170
-
-If you are trying to run my launcher from a VM, it requires at a minimum OpenGL3.3, so you must enable "3D acceleration", (or similar), in your VM settings and then pray.
+Then you need to download and install the Microsoft VC Redistributable from here:<br/>
+https://learn.microsoft.com/en-us/cpp/windows/latest-supported-vc-redist?view=msvc-170<br/>
+<br/>
+If you are trying to run my launcher from a VM, it requires at a minimum OpenGL3.3, so you must enable "3D acceleration", (or similar), in your VM settings and then pray.<br/>
 
 ## Screenshot
 ![Dedi](dedi.png)
