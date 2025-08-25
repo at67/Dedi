@@ -16,6 +16,8 @@ Is a Windows 10/11 only tool that allows for the simple installation, monitoring
 - **One-click start/stop** - No batch files or commands
 
 ## Install
+- Install the Aska Dedicated Server through Steam on the same PC/Laptop you will be installing Dedi on.
+- Do NOT install Dedi into the same folder as your Aska Dedicated Server or the Aska game!
 - Download the latest release at: https://github.com/at67/Dedi/releases<br/>
 - The zip file should contain one folder and three files:
 	- styles, (folder)
@@ -39,6 +41,7 @@ Is a Windows 10/11 only tool that allows for the simple installation, monitoring
 ## Quick Start (3 Steps)
 
 ### Step 1: Install Dedi (2 minutes)
+0. Install the Aska Dedicated Server through Steam on the same PC/Laptop you will be installing Dedi on. Do NOT install Dedi into the same folder as your Aska Dedicated Server or the Aska game!
 1. Download from https://github.com/at67/Dedi/releases
 2. Extract to a new folder (e.g., `C:\Dedi`) - **NOT in your Aska game folder**
 3. Run `Dedi_x64.exe` (or `Dedi_x86.exe` for 32-bit)
