@@ -86,10 +86,10 @@ That's it! Advanced settings are optional.
 [Configuration Reference](doc/Configuration_Reference.pdf)
 
 ## Troubleshooting Guide
-[Troubleshooting Guide](doc/Troubleshooting_Guide.pdf)<br/>
+[Troubleshooting Guide](doc/Troubleshooting_Guide.pdf)<br/><br/>
 If you see either or both of these errors:<br/>
 ![MSVCP](MSVCP_error.png)
-![VCRUNTIME](VCRUNTIME_error.png)
+![VCRUNTIME](VCRUNTIME_error.png)<br/>
 Then you need to download and install the Microsoft VC Redistributable from here:<br/>
 https://learn.microsoft.com/en-us/cpp/windows/latest-supported-vc-redist?view=msvc-170<br/>
 <br/>
