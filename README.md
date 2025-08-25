@@ -30,12 +30,12 @@ Is a Windows 10/11 only tool that allows for the simple installation, monitoring
 	C:\Dedi\Dedi_x64.exe<br/>
 	C:\Dedi\Dedi_x86.exe<br/>
 	C:\Dedi\viking.png<br/>
- - If you are installing Dedi and the Aska Dedicated Server on a different PC/Laptop to your PC/Laptop that the main Aska game is installed on, then you need to do the following:
-	a) You need to login to the same steam account that your purchased the main game game on.
-	b) Download/install the Aska Dedicated Server.
-	c) Install Dedi to this PC/Laptop, NOT to the same folder as the Aska Dedicated Server.
-	d) From then on when you launch the Aska dedicated server, (through Dedi), it will login anonymously into SteamCmd using your authorisation token saved in your "server properties.txt" file to launch the actual server.
-	e) You don't need multiple steam accounts and you don't need to be logged into Steam to launch the Aska Dedicated Server, (you only need to login to Steam once to download/install it).
+ - If you are installing Dedi and the Aska Dedicated Server on a different PC/Laptop to your PC/Laptop that the main Aska game is installed on, then you need to do the following:<br/>
+	a) You need to login to the same steam account that your purchased the main game game on.<br/>
+	b) Download/install the Aska Dedicated Server.<br/>
+	c) Install Dedi to this PC/Laptop, NOT to the same folder as the Aska Dedicated Server.<br/>
+	d) From then on when you launch the Aska dedicated server, (through Dedi), it will login anonymously into SteamCmd using your authorisation token saved in your "server properties.txt" file to launch the actual server.<br/>
+	e) You don't need multiple steam accounts and you don't need to be logged into Steam to launch the Aska Dedicated Server, (you only need to login to Steam once to download/install it).<br/>
 
 ## Usage
 - Run either Dedi_x64.exe or Dedi_x86.exe depending on your OS, if it is 32bit use Dedi_x86.exe, otherwise use Dedi_x64.exe.
